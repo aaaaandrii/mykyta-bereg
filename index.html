@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mykyta Bereg — Creative Director" />
+    <title>Mykyta Bereg</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Fullscreen Background Videos -->
+    <div class="background-videos" id="backgroundVideos"></div>
+
+    <!-- Page Content -->
+    <div class="page-wrapper">
+      <!-- Top Navigation -->
+      <header class="header">
+        <span onclick="navigateTo('index.html')" class="logo">Mykyta <img src="./logo.png" alt="" class="logo-icon"> Bereg</span>
+        <div class="header-nav">
+          <span onclick="navigateTo('works.html')" class="nav-link">Works</span>
+          <span onclick="navigateTo('about.html')" class="nav-link">About</span>
+          <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+        </div>
+      </header>
+
+      <!-- Fullscreen Click Area -->
+      <div class="fullscreen-link" id="projectLink"></div>
+
+      <!-- Project Info - Bottom -->
+      <div class="project-info">
+        <div class="project-name" id="projectName"></div>
+        <div class="project-year" id="projectYear"></div>
+      </div>
+    </div>
+
+    <div class="copyright">All Rights Reserved &copy; Oveay 2026</div>
+
+    <script src="./projects-data.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

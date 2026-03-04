@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mykyta Bereg — Works" />
+    <title>Works — Mykyta Bereg</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page-works">
+    <!-- Background Videos -->
+    <div class="works-video-bg" id="worksVideoBg"></div>
+
+    <!-- Page Content -->
+    <div class="page-wrapper">
+      <!-- Top Navigation -->
+      <header class="header">
+        <span onclick="navigateTo('index.html')" class="logo">Mykyta <img src="./logo.png" alt="" class="logo-icon"> Bereg</span>
+        <div class="header-nav">
+          <span onclick="navigateTo('works.html')" class="nav-link active-link">Works</span>
+          <span onclick="navigateTo('about.html')" class="nav-link">About</span>
+          <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+        </div>
+      </header>
+
+      <script>
+        function navigateTo(url) { window.location.href = url; }
+      </script>
+
+      <!-- Works List - Triple for infinite scroll illusion -->
+      <div class="works-list" id="worksList"></div>
+    </div>
+
+    <script src="./projects-data.js"></script>
+    <script>
+      const projects = getProjects();
+      const totalVideos = projects.length;
+
+      // Generate background videos
+      const videoBgContainer = document.getElementById('worksVideoBg');
+      projects.forEach((p, i) => {
+        const video = document.createElement('video');
+        video.className = 'works-video' + (i === 0 ? ' active' : '');
+        video.dataset.index = i;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        const source = document.createElement('source');
+        source.src = p.video;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        videoBgContainer.appendChild(video);
+      });
+
+      // Generate works list (3 sets for infinite scroll)
+      const worksList = document.getElementById('worksList');
+      let itemIndex = 0;
+      for (let set = 0; set < 3; set++) {
+        projects.forEach((p, videoIdx) => {
+          const div = document.createElement('div');
+          div.className = 'works-item' + (set === 1 && videoIdx === 0 ? ' active' : '');
+          div.dataset.index = itemIndex;
+          div.dataset.video = videoIdx;
+          div.innerHTML = `<span class="work-name">${p.name}</span><span class="work-date">${p.year}</span>`;
+          worksList.appendChild(div);
+          itemIndex++;
+        });
+      }
+
+      const worksItems = document.querySelectorAll('.works-item');
+      const worksVideos = document.querySelectorAll('.works-video');
+
+      const totalItems = worksItems.length;
+      const startIndex = totalVideos;
+
+      let currentIndex = startIndex;
+      let isAnimating = false;
+      const animationDuration = 50;
+
+      let velocity = 0;
+      let lastScrollTime = 0;
+      let inertiaFrame = null;
+
+      function centerActiveItem(index) {
+        const activeItem = worksItems[index];
+        const viewportCenter = window.innerHeight / 2;
+        let offset = 0;
+        for (let i = 0; i < index; i++) {
+          offset += worksItems[i].offsetHeight;
+        }
+        offset += activeItem.offsetHeight / 2;
+        const translateY = viewportCenter - offset;
+        worksList.style.transform = `translateY(${translateY}px)`;
+      }
+
+      function setActiveItem(index, skipAnimation = false) {
+        if (index < 0) {
+          index = totalItems - 1;
+        } else if (index >= totalItems) {
+          index = 0;
+        }
+
+        if (index === currentIndex) return;
+
+        if (!skipAnimation) {
+          isAnimating = true;
+        }
+
+        worksItems.forEach((item, i) => {
+          item.classList.remove('active');
+          if (i === index) {
+            item.classList.add('active');
+          }
+        });
+
+        centerActiveItem(index);
+
+        const videoIndex = parseInt(worksItems[index].dataset.video);
+        const prevVideoIndex = parseInt(worksItems[currentIndex].dataset.video);
+
+        if (videoIndex !== prevVideoIndex) {
+          worksVideos.forEach((video, i) => {
+            if (i === prevVideoIndex) {
+              video.classList.remove('active');
+              video.pause();
+            }
+            if (i === videoIndex) {
+              video.classList.add('active');
+              video.play().catch(() => {});
+            }
+          });
+        }
+
+        currentIndex = index;
+
+        const middleStart = totalVideos;
+        const middleEnd = totalVideos * 2 - 1;
+
+        if (currentIndex < middleStart || currentIndex > middleEnd) {
+          const videoIdx = parseInt(worksItems[currentIndex].dataset.video);
+          const newIndex = middleStart + videoIdx;
+
+          worksList.style.transition = 'none';
+
+          worksItems.forEach((item, i) => {
+            item.classList.remove('active');
+            if (i === newIndex) {
+              item.classList.add('active');
+            }
+          });
+
+          centerActiveItem(newIndex);
+          currentIndex = newIndex;
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              worksList.style.transition = '';
+            });
+          });
+        }
+
+        if (!skipAnimation) {
+          setTimeout(() => {
+            isAnimating = false;
+          }, animationDuration);
+        }
+      }
+
+      function init() {
+        centerActiveItem(startIndex);
+        worksVideos[0].play().catch(() => {});
+      }
+
+      window.addEventListener('resize', () => {
+        centerActiveItem(currentIndex);
+      });
+
+      worksItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+          if (item.classList.contains('active')) {
+            const videoIndex = parseInt(item.dataset.video);
+            window.location.href = `project.html?id=${videoIndex}`;
+          } else if (!isAnimating) {
+            setActiveItem(index);
+          }
+        });
+      });
+
+      init();
+
+      const videoBg = document.getElementById('worksVideoBg');
+      videoBg.addEventListener('click', () => {
+        const videoIndex = parseInt(worksItems[currentIndex].dataset.video);
+        window.location.href = `project.html?id=${videoIndex}`;
+      });
+
+      const scrollThreshold = 240;
+      let scrollAccumulator = 0;
+
+      function processInertia() {
+        if (Math.abs(velocity) > 0.5) {
+          velocity *= 0.85;
+          scrollAccumulator += velocity;
+
+          if (Math.abs(scrollAccumulator) >= scrollThreshold && !isAnimating) {
+            if (scrollAccumulator > 0) {
+              setActiveItem(currentIndex + 1);
+            } else {
+              setActiveItem(currentIndex - 1);
+            }
+            scrollAccumulator = 0;
+          }
+
+          inertiaFrame = requestAnimationFrame(processInertia);
+        } else {
+          velocity = 0;
+          scrollAccumulator = 0;
+        }
+      }
+
+      window.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const now = Date.now();
+        lastScrollTime = now;
+        velocity += e.deltaY * 0.3;
+        velocity = Math.max(-50, Math.min(50, velocity));
+
+        if (inertiaFrame) {
+          cancelAnimationFrame(inertiaFrame);
+        }
+
+        scrollAccumulator += e.deltaY;
+
+        if (Math.abs(scrollAccumulator) >= scrollThreshold && !isAnimating) {
+          if (scrollAccumulator > 0) {
+            setActiveItem(currentIndex + 1);
+          } else {
+            setActiveItem(currentIndex - 1);
+          }
+          scrollAccumulator = 0;
+        }
+
+        inertiaFrame = requestAnimationFrame(processInertia);
+      }, { passive: false });
+
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let touchVelocity = 0;
+
+      window.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+        touchVelocity = 0;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        const currentY = e.touches[0].clientY;
+        const now = Date.now();
+        const timeDelta = now - touchStartTime;
+        if (timeDelta > 0) {
+          touchVelocity = (touchStartY - currentY) / timeDelta * 10;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => {
+        if (isAnimating) return;
+        if (Math.abs(touchVelocity) > 0.5) {
+          if (touchVelocity > 0) {
+            setActiveItem(currentIndex + 1);
+          } else {
+            setActiveItem(currentIndex - 1);
+          }
+        }
+        touchStartY = 0;
+        touchVelocity = 0;
+      }, { passive: true });
+
+      window.addEventListener('keydown', (e) => {
+        if (isAnimating) return;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          setActiveItem(currentIndex + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setActiveItem(currentIndex - 1);
+        }
+      });
+    </script>
+    <div class="copyright">All Rights Reserved &copy; Oveay 2026</div>
+  </body>
+</html>

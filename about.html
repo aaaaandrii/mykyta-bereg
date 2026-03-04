@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mykyta Bereg — About" />
+    <title>About — Mykyta Bereg</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page-about">
+    <!-- Page Content -->
+    <div class="page-wrapper">
+      <!-- Top Navigation - Evenly distributed -->
+      <header class="header">
+        <span onclick="navigateTo('index.html')" class="logo">Mykyta <img src="./logo.png" alt="" class="logo-icon"> Bereg</span>
+        <div class="header-nav">
+          <span onclick="navigateTo('works.html')" class="nav-link">Works</span>
+          <span onclick="navigateTo('about.html')" class="nav-link active-link">About</span>
+          <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+        </div>
+      </header>
+      
+      <script>
+        function navigateTo(url) { window.location.href = url; }
+      </script>
+
+      <!-- About Bio - Centered -->
+      <div class="about-bio">
+        Mykyta Bereg is a Ukrainian-born, <em>award-winning editor</em> and <em>art director</em>. Mykyta is represented by Church Edit in the US and lives across Europe.
+      </div>
+
+      <!-- Awards Marquee - Bottom -->
+      <div class="marquee-container">
+        <div class="marquee-track">
+          <div class="marquee-content awards-marquee">
+            <img src="./awards/BC_win23_20002 1.png" alt="" class="award-logo">
+            <img src="./awards/Editor of the Year 1.png" alt="" class="award-logo">
+            <img src="./awards/Group 1.png" alt="" class="award-logo">
+            <img src="./awards/LBB-x-AICP.E2D6bEwv 1.png" alt="" class="award-logo">
+            <img src="./awards/Webby_logo-copy 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/fichero_36342_20231114 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/laurels_BNT_Editor_2024 1.png" alt="" class="award-logo">
+            <img src="./awards/logo_oes 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/site-logo 1 [Vectorized].png" alt="" class="award-logo">
+          </div>
+          <div class="marquee-content awards-marquee">
+            <img src="./awards/BC_win23_20002 1.png" alt="" class="award-logo">
+            <img src="./awards/Editor of the Year 1.png" alt="" class="award-logo">
+            <img src="./awards/Group 1.png" alt="" class="award-logo">
+            <img src="./awards/LBB-x-AICP.E2D6bEwv 1.png" alt="" class="award-logo">
+            <img src="./awards/Webby_logo-copy 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/fichero_36342_20231114 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/laurels_BNT_Editor_2024 1.png" alt="" class="award-logo">
+            <img src="./awards/logo_oes 1 [Vectorized].png" alt="" class="award-logo">
+            <img src="./awards/site-logo 1 [Vectorized].png" alt="" class="award-logo">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const marqueeTrack = document.querySelector('.marquee-track');
+      
+      // Speed range: 5s (fast at bottom) to 40s (slow at top)
+      const minDuration = 5;
+      const maxDuration = 40;
+      
+      document.addEventListener('mousemove', (e) => {
+        // Get vertical position as percentage (0 = top, 1 = bottom)
+        const yPercent = e.clientY / window.innerHeight;
+        
+        // Invert: bottom = fast, top = slow
+        const duration = maxDuration - (yPercent * (maxDuration - minDuration));
+        
+        marqueeTrack.style.animationDuration = `${duration}s`;
+      });
+
+    </script>
+  </body>
+</html>
