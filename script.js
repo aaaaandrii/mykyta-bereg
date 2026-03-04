@@ -121,11 +121,50 @@ function initMouseTracking() {
 }
 
 // ========================================
+// Touch Interaction - Swipe to change videos
+// ========================================
+
+function initTouchTracking() {
+  let touchActive = false;
+
+  document.addEventListener('touchstart', (e) => {
+    touchActive = true;
+    handleTouch(e.touches[0]);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!touchActive) return;
+    const now = Date.now();
+    if (now - lastChangeTime < changeDelay) return;
+    handleTouch(e.touches[0]);
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    touchActive = false;
+  }, { passive: true });
+
+  function handleTouch(touch) {
+    const colWidth = window.innerWidth / COLS;
+    const rowHeight = window.innerHeight / ROWS;
+    const col = Math.floor(touch.clientX / colWidth);
+    const row = Math.floor(touch.clientY / rowHeight);
+    let index = row * COLS + col;
+    index = Math.max(0, Math.min(index, totalVideos - 1));
+
+    if (index !== currentVideoIndex) {
+      showVideo(index);
+      lastChangeTime = Date.now();
+    }
+  }
+}
+
+// ========================================
 // Initialize
 // ========================================
 
 function init() {
   initMouseTracking();
+  initTouchTracking();
 }
 
 if (document.readyState === 'loading') {

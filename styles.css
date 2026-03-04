@@ -157,9 +157,9 @@ a {
   display: flex;
   align-items: center;
   gap: 1px;
-  font-family: 'Suisse Intl', sans-serif;
+  font-family: 'Instrument Serif', serif;
   font-size: clamp(8px, 2vw, 24px);
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: -0.05em;
   line-height: 0.9;
@@ -949,29 +949,209 @@ a {
 ======================================== */
 
 @media (max-width: 768px) {
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+  }
+
+  .logo {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    font-size: 11px;
+  }
+
+  .header-nav {
+    gap: 8px;
+  }
+
+  .nav-link {
+    font-size: 11px;
+  }
+
+  /* Main page */
+  .project-info {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    gap: 4pt;
+  }
+
+  .project-name {
+    font-size: 12px;
+  }
+
   .project-year {
     font-size: 8px;
   }
-  
+
+  /* About page */
+  .about-bio {
+    width: 90%;
+    padding: 0 5%;
+    font-size: clamp(14px, 4vw, 22px);
+  }
+
   .marquee span {
     font-size: 13px;
   }
-  
+
   .marquee {
     gap: 40px;
+  }
+
+  .award-logo {
+    height: 28px;
+  }
+
+  /* Contact page */
+  .contact-columns {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .contact-column {
+    width: auto;
+    align-items: center;
+  }
+
+  .contact-details {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .contact-region {
+    font-size: 14px;
+  }
+
+  .contact-email,
+  .contact-phone {
+    font-size: 13px;
+  }
+
+  .social-links {
+    left: 8px;
+    bottom: 8px;
+    gap: 16px;
+  }
+
+  /* Works page */
+  .works-item {
+    font-size: 11px;
+    padding-left: 8px;
+  }
+
+  .works-item.active {
+    font-size: clamp(12px, 6vw, 36px);
+  }
+
+  .work-date {
+    font-size: 5pt;
+  }
+
+  /* Copyright */
+  .copyright {
+    right: 8px;
+    bottom: 8px;
+    font-size: 7px;
+  }
+
+  /* Project page */
+  .project-layout {
+    flex-direction: column;
+    gap: 16px;
+    left: 8px;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .project-col-player {
+    width: 100%;
+  }
+
+  .project-col-credits {
+    flex-direction: row;
+    gap: 16px;
+    padding-bottom: 0;
+  }
+
+  .player-controls {
+    gap: 6px;
+    padding: 6px 0;
+  }
+
+  .volume-slider-wrap {
+    width: 40px;
+  }
+
+  .volume-slider {
+    width: 40px;
+  }
+
+  .ctrl-time {
+    font-size: 7px;
+    min-width: 28px;
+  }
+
+  .project-page-title-wrap {
+    left: 8px;
+    top: 8px;
+  }
+
+  .project-page-title {
+    font-size: 12px;
+  }
+
+  .project-page-year {
+    font-size: 8px;
+  }
+
+  .credit-label {
+    font-size: 8px;
+  }
+
+  .credit-value {
+    font-size: 12px;
+  }
+
+  .play-btn-overlay svg {
+    width: 40px;
+    height: 40px;
   }
 }
 
 @media (max-width: 480px) {
-  .header {
-    flex-wrap: wrap;
-    gap: 8px;
+  .logo {
+    font-size: 10px;
   }
 
-  .works-grid {
-    grid-template-columns: 1fr;
+  .nav-link {
+    font-size: 10px;
   }
-  
+
+  .project-name {
+    font-size: 10px;
+  }
+
+  .about-bio {
+    font-size: clamp(13px, 4.5vw, 18px);
+  }
+
+  .works-item {
+    font-size: 9px;
+  }
+
+  .works-item.active {
+    font-size: clamp(10px, 7vw, 28px);
+  }
+
   .project-year {
     font-size: 6px;
   }
