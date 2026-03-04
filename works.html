@@ -56,13 +56,15 @@
         videoBgContainer.appendChild(video);
       });
 
-      // Generate works list (3 sets for infinite scroll)
+      // Generate works list (5 sets for infinite scroll)
       const worksList = document.getElementById('worksList');
+      const numSets = 5;
+      const middleSet = 2;
       let itemIndex = 0;
-      for (let set = 0; set < 3; set++) {
+      for (let set = 0; set < numSets; set++) {
         projects.forEach((p, videoIdx) => {
           const div = document.createElement('div');
-          div.className = 'works-item' + (set === 1 && videoIdx === 0 ? ' active' : '');
+          div.className = 'works-item' + (set === middleSet && videoIdx === 0 ? ' active' : '');
           div.dataset.index = itemIndex;
           div.dataset.video = videoIdx;
           div.innerHTML = `<span class="work-name">${p.name}</span><span class="work-date">${p.year}</span>`;
@@ -75,7 +77,7 @@
       const worksVideos = document.querySelectorAll('.works-video');
 
       const totalItems = worksItems.length;
-      const startIndex = totalVideos;
+      const startIndex = totalVideos * middleSet;
 
       let currentIndex = startIndex;
       let isAnimating = false;
@@ -137,8 +139,8 @@
 
         currentIndex = index;
 
-        const middleStart = totalVideos;
-        const middleEnd = totalVideos * 2 - 1;
+        const middleStart = totalVideos * middleSet;
+        const middleEnd = totalVideos * (middleSet + 1) - 1;
 
         if (currentIndex < middleStart || currentIndex > middleEnd) {
           const videoIdx = parseInt(worksItems[currentIndex].dataset.video);
@@ -248,35 +250,33 @@
       }, { passive: false });
 
       let touchStartY = 0;
-      let touchStartTime = 0;
-      let touchVelocity = 0;
+      const touchThreshold = 60;
 
       window.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
-        touchStartTime = Date.now();
-        touchVelocity = 0;
-      }, { passive: true });
-
-      window.addEventListener('touchmove', (e) => {
-        const currentY = e.touches[0].clientY;
-        const now = Date.now();
-        const timeDelta = now - touchStartTime;
-        if (timeDelta > 0) {
-          touchVelocity = (touchStartY - currentY) / timeDelta * 10;
+        if (inertiaFrame) {
+          cancelAnimationFrame(inertiaFrame);
+          velocity = 0;
         }
       }, { passive: true });
 
-      window.addEventListener('touchend', () => {
-        if (isAnimating) return;
-        if (Math.abs(touchVelocity) > 0.5) {
-          if (touchVelocity > 0) {
+      window.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const currentY = e.touches[0].clientY;
+        const delta = touchStartY - currentY;
+
+        if (Math.abs(delta) >= touchThreshold && !isAnimating) {
+          if (delta > 0) {
             setActiveItem(currentIndex + 1);
           } else {
             setActiveItem(currentIndex - 1);
           }
+          touchStartY = currentY;
         }
+      }, { passive: false });
+
+      window.addEventListener('touchend', () => {
         touchStartY = 0;
-        touchVelocity = 0;
       }, { passive: true });
 
       window.addEventListener('keydown', (e) => {

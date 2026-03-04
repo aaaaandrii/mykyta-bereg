@@ -157,9 +157,9 @@ a {
   display: flex;
   align-items: center;
   gap: 1px;
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Suisse Intl', sans-serif;
   font-size: clamp(8px, 2vw, 24px);
-  font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: -0.05em;
   line-height: 0.9;
@@ -223,8 +223,8 @@ a {
   top: 5pt;
   left: 5pt;
   display: flex;
-  align-items: baseline;
-  gap: 6pt;
+  align-items: flex-start;
+  gap: 4pt;
   white-space: nowrap;
   z-index: 3;
   padding: 0;
@@ -237,7 +237,7 @@ a {
   font-size: clamp(8px, 2vw, 24px);
   font-weight: 600;
   letter-spacing: -0.05em;
-  line-height: 0.85;
+  line-height: 0.9;
   text-transform: uppercase;
   transition: opacity 0.3s ease;
   padding: 0;
@@ -250,7 +250,7 @@ a {
 
 .project-year {
   font-family: 'Times New Roman', Times, serif;
-  font-size: 12px;
+  font-size: 4px;
   font-weight: 400;
   letter-spacing: var(--letter-spacing);
   transition: opacity 0.3s ease;
@@ -660,8 +660,8 @@ a {
   top: 5pt;
   left: 5pt;
   display: flex;
-  align-items: baseline;
-  gap: 6pt;
+  align-items: flex-start;
+  gap: 4pt;
   z-index: 3;
 }
 
@@ -678,7 +678,7 @@ a {
 
 .project-page-year {
   font-family: 'Times New Roman', Times, serif;
-  font-size: 12px;
+  font-size: 4px;
   font-weight: 400;
   letter-spacing: var(--letter-spacing);
   color: var(--fg);
@@ -706,6 +706,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: flex-start;
   gap: 16px;
   padding-bottom: 4px;
   flex-shrink: 0;
@@ -925,7 +926,7 @@ a {
 
 .credit-label {
   font-family: 'Times New Roman', Times, serif;
-  font-size: 12px;
+  font-size: clamp(8px, 2vw, 24px);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing);
@@ -949,45 +950,6 @@ a {
 ======================================== */
 
 @media (max-width: 768px) {
-  /* Header */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-  }
-
-  .logo {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    font-size: 11px;
-  }
-
-  .header-nav {
-    gap: 8px;
-  }
-
-  .nav-link {
-    font-size: 11px;
-  }
-
-  /* Main page */
-  .project-info {
-    top: auto;
-    bottom: 8px;
-    left: 8px;
-    gap: 4pt;
-  }
-
-  .project-name {
-    font-size: 12px;
-  }
-
-  .project-year {
-    font-size: 8px;
-  }
 
   /* About page */
   .about-bio {
@@ -1080,6 +1042,8 @@ a {
     flex-direction: row;
     gap: 16px;
     padding-bottom: 0;
+    align-items: flex-start;
+    align-self: flex-start;
   }
 
   .player-controls {
@@ -1100,27 +1064,6 @@ a {
     min-width: 28px;
   }
 
-  .project-page-title-wrap {
-    left: 8px;
-    top: 8px;
-  }
-
-  .project-page-title {
-    font-size: 12px;
-  }
-
-  .project-page-year {
-    font-size: 8px;
-  }
-
-  .credit-label {
-    font-size: 8px;
-  }
-
-  .credit-value {
-    font-size: 12px;
-  }
-
   .play-btn-overlay svg {
     width: 40px;
     height: 40px;
@@ -1128,18 +1071,6 @@ a {
 }
 
 @media (max-width: 480px) {
-  .logo {
-    font-size: 10px;
-  }
-
-  .nav-link {
-    font-size: 10px;
-  }
-
-  .project-name {
-    font-size: 10px;
-  }
-
   .about-bio {
     font-size: clamp(13px, 4.5vw, 18px);
   }
@@ -1150,9 +1081,5 @@ a {
 
   .works-item.active {
     font-size: clamp(10px, 7vw, 28px);
-  }
-
-  .project-year {
-    font-size: 6px;
   }
 }
