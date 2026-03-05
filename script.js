@@ -45,6 +45,7 @@ const ROWS = 4;
 let currentVideoIndex = 0;
 let lastChangeTime = 0;
 const changeDelay = 100;
+let autoplayActive = false;
 
 function updateProjectName(name, year) {
   if (!projectNameEl) return;
@@ -91,6 +92,7 @@ function showVideo(index) {
       }
     }
     currentVideoIndex = index;
+    if (autoplayActive && typeof bindAutoplayEnd === 'function') bindAutoplayEnd();
   }
 }
 
@@ -129,6 +131,7 @@ function initTouchTracking() {
 
   document.addEventListener('touchstart', (e) => {
     touchActive = true;
+    pauseAutoplay();
     handleTouch(e.touches[0]);
   }, { passive: true });
 
@@ -141,6 +144,7 @@ function initTouchTracking() {
 
   document.addEventListener('touchend', () => {
     touchActive = false;
+    resumeAutoplay();
   }, { passive: true });
 
   function handleTouch(touch) {
@@ -159,12 +163,60 @@ function initTouchTracking() {
 }
 
 // ========================================
+// Mobile Autoplay - play full video then advance
+// ========================================
+
+function isMobile() {
+  return 'ontouchstart' in window || window.innerWidth <= 768;
+}
+
+function onVideoEnded() {
+  if (!autoplayActive) return;
+  const nextIndex = (currentVideoIndex + 1) % totalVideos;
+  showVideo(nextIndex);
+  bindAutoplayEnd();
+}
+
+function bindAutoplayEnd() {
+  if (!autoplayActive) return;
+  const wrapper = document.querySelector(`.bg-video-wrapper[data-index="${currentVideoIndex}"]`);
+  if (!wrapper) return;
+  const video = wrapper.querySelector('.bg-video');
+  if (video) {
+    video.loop = false;
+    video.removeEventListener('ended', onVideoEnded);
+    video.addEventListener('ended', onVideoEnded);
+  }
+}
+
+function startAutoplay() {
+  if (!isMobile()) return;
+  autoplayActive = true;
+  videoWrappers.forEach(w => {
+    const v = w.querySelector('.bg-video');
+    if (v) v.loop = false;
+  });
+  bindAutoplayEnd();
+}
+
+function pauseAutoplay() {
+  autoplayActive = false;
+}
+
+function resumeAutoplay() {
+  if (!isMobile()) return;
+  autoplayActive = true;
+  bindAutoplayEnd();
+}
+
+// ========================================
 // Initialize
 // ========================================
 
 function init() {
   initMouseTracking();
   initTouchTracking();
+  startAutoplay();
 }
 
 if (document.readyState === 'loading') {
