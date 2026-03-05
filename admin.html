@@ -439,6 +439,10 @@
                   <input type="text" value="${esc(p.production)}" oninput="updateField(${i}, 'production', this.value)" />
                 </div>
                 <div class="form-group full-width">
+                  <label>Description</label>
+                  <input type="text" value="${esc(p.description || '')}" oninput="updateField(${i}, 'description', this.value)" placeholder="Project description" />
+                </div>
+                <div class="form-group full-width">
                   <label>Video File Path</label>
                   <input type="text" value="${esc(p.video)}" oninput="updateField(${i}, 'video', this.value)" placeholder="./videos/filename.mp4" />
                 </div>
@@ -510,7 +514,8 @@
           year: new Date().getFullYear().toString(),
           video: './videos/',
           director: 'Director Name',
-          production: 'Production Name'
+          production: 'Production Name',
+          description: ''
         });
         render();
         // Open the new card
