@@ -51,15 +51,17 @@ function loadVideo(index) {
   const wrapper = videoWrappers[index];
   if (!wrapper) return;
   const video = wrapper.querySelector('.bg-video');
-  if (!video || video.src) return;
+  if (!video) return;
 
   const src = video.dataset.src;
   if (!src) return;
 
-  const source = document.createElement('source');
-  source.src = src;
-  source.type = 'video/mp4';
-  video.appendChild(source);
+  if (!video.querySelector('source')) {
+    const source = document.createElement('source');
+    source.src = src;
+    source.type = 'video/mp4';
+    video.appendChild(source);
+  }
   video.preload = 'metadata';
   video.load();
   loadedVideos.add(index);
@@ -67,11 +69,13 @@ function loadVideo(index) {
   video.addEventListener('loadeddata', function capturePoster() {
     video.removeEventListener('loadeddata', capturePoster);
     try {
+      var mobile = isMobile();
       var canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      var scale = mobile ? 0.25 : 0.5;
+      canvas.width = video.videoWidth * scale;
+      canvas.height = video.videoHeight * scale;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', mobile ? 0.5 : 0.7);
       posterCache[index] = dataUrl;
       wrapper.style.backgroundImage = 'url(' + dataUrl + ')';
       wrapper.style.backgroundSize = 'cover';
@@ -80,15 +84,37 @@ function loadVideo(index) {
   }, { once: true });
 }
 
+function unloadVideo(index) {
+  if (!posterCache[index]) return;
+  var wrapper = videoWrappers[index];
+  if (!wrapper) return;
+  var video = wrapper.querySelector('.bg-video');
+  if (!video) return;
+  video.pause();
+  video.removeAttribute('src');
+  var source = video.querySelector('source');
+  if (source) source.removeAttribute('src');
+  video.load();
+  video.preload = 'none';
+  loadedVideos.delete(index);
+}
+
 function preloadNearby(index) {
   loadVideo(index);
-  var cols = COLS;
-  var row = Math.floor(index / cols);
-  var col = index % cols;
-  for (var dr = -1; dr <= 1; dr++) {
-    for (var dc = -1; dc <= 1; dc++) {
-      var ni = (row + dr) * cols + (col + dc);
-      if (ni >= 0 && ni < totalVideos) loadVideo(ni);
+  if (isMobile()) {
+    var next1 = (index + 1) % totalVideos;
+    var next2 = (index + 2) % totalVideos;
+    loadVideo(next1);
+    loadVideo(next2);
+  } else {
+    var cols = COLS;
+    var row = Math.floor(index / cols);
+    var col = index % cols;
+    for (var dr = -1; dr <= 1; dr++) {
+      for (var dc = -1; dc <= 1; dc++) {
+        var ni = (row + dr) * cols + (col + dc);
+        if (ni >= 0 && ni < totalVideos) loadVideo(ni);
+      }
     }
   }
 }
@@ -115,11 +141,16 @@ function showVideo(index) {
   loadVideo(index);
   preloadNearby(index);
 
+  var mobile = isMobile();
   videoWrappers.forEach((wrapper, i) => {
     wrapper.classList.remove('active');
     const video = wrapper.querySelector('.bg-video');
     if (video && i !== index) {
       video.pause();
+      if (mobile && posterCache[i]) {
+        var dist = Math.min(Math.abs(i - index), totalVideos - Math.abs(i - index));
+        if (dist > 3) unloadVideo(i);
+      }
     }
   });
 
@@ -256,10 +287,11 @@ function resumeAutoplay() {
 }
 
 // ========================================
-// Background preload: load all remaining videos after initial paint
+// Background preload: desktop loads all, mobile stays lean
 // ========================================
 
 function preloadAllRemaining() {
+  if (isMobile()) return;
   var i = 0;
   function next() {
     if (i >= totalVideos) return;
