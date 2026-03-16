@@ -12,18 +12,15 @@ const projects = getProjects();
 const bgContainer = document.getElementById('backgroundVideos');
 projects.forEach((p, i) => {
   const wrapper = document.createElement('div');
-  wrapper.className = 'bg-video-wrapper' + (i === 0 ? ' active' : '');
+  wrapper.className = 'bg-video-wrapper';
   wrapper.dataset.index = i;
   const video = document.createElement('video');
   video.className = 'bg-video';
   video.muted = true;
   video.loop = true;
   video.playsInline = true;
-  video.preload = 'auto';
-  const source = document.createElement('source');
-  source.src = p.video;
-  source.type = 'video/mp4';
-  video.appendChild(source);
+  video.preload = 'none';
+  video.dataset.src = p.video;
   wrapper.appendChild(video);
   bgContainer.appendChild(wrapper);
 });
@@ -33,7 +30,6 @@ projects.forEach((p, i) => {
 // ========================================
 
 const videoWrappers = document.querySelectorAll('.bg-video-wrapper');
-const videos = document.querySelectorAll('.bg-video');
 const projectNameEl = document.getElementById('projectName');
 const projectYearEl = document.getElementById('projectYear');
 const projectLink = document.getElementById('projectLink');
@@ -42,10 +38,60 @@ const totalVideos = videoWrappers.length;
 const COLS = 6;
 const ROWS = 4;
 
-let currentVideoIndex = 0;
+let currentVideoIndex = -1;
 let lastChangeTime = 0;
 const changeDelay = 100;
 let autoplayActive = false;
+
+const loadedVideos = new Set();
+const posterCache = {};
+
+function loadVideo(index) {
+  if (loadedVideos.has(index)) return;
+  const wrapper = videoWrappers[index];
+  if (!wrapper) return;
+  const video = wrapper.querySelector('.bg-video');
+  if (!video || video.src) return;
+
+  const src = video.dataset.src;
+  if (!src) return;
+
+  const source = document.createElement('source');
+  source.src = src;
+  source.type = 'video/mp4';
+  video.appendChild(source);
+  video.preload = 'metadata';
+  video.load();
+  loadedVideos.add(index);
+
+  video.addEventListener('loadeddata', function capturePoster() {
+    video.removeEventListener('loadeddata', capturePoster);
+    try {
+      var canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      posterCache[index] = dataUrl;
+      wrapper.style.backgroundImage = 'url(' + dataUrl + ')';
+      wrapper.style.backgroundSize = 'cover';
+      wrapper.style.backgroundPosition = 'center';
+    } catch (e) {}
+  }, { once: true });
+}
+
+function preloadNearby(index) {
+  loadVideo(index);
+  var cols = COLS;
+  var row = Math.floor(index / cols);
+  var col = index % cols;
+  for (var dr = -1; dr <= 1; dr++) {
+    for (var dc = -1; dc <= 1; dc++) {
+      var ni = (row + dr) * cols + (col + dc);
+      if (ni >= 0 && ni < totalVideos) loadVideo(ni);
+    }
+  }
+}
 
 function updateProjectName(name, year) {
   if (!projectNameEl) return;
@@ -66,6 +112,9 @@ function updateProjectName(name, year) {
 function showVideo(index) {
   if (index === currentVideoIndex) return;
 
+  loadVideo(index);
+  preloadNearby(index);
+
   videoWrappers.forEach((wrapper, i) => {
     wrapper.classList.remove('active');
     const video = wrapper.querySelector('.bg-video');
@@ -74,11 +123,12 @@ function showVideo(index) {
     }
   });
 
-  const targetWrapper = document.querySelector(`.bg-video-wrapper[data-index="${index}"]`);
+  const targetWrapper = videoWrappers[index];
   if (targetWrapper) {
     targetWrapper.classList.add('active');
     const video = targetWrapper.querySelector('.bg-video');
     if (video) {
+      video.preload = 'auto';
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {});
@@ -175,7 +225,7 @@ function onVideoEnded() {
 
 function bindAutoplayEnd() {
   if (!autoplayActive) return;
-  const wrapper = document.querySelector(`.bg-video-wrapper[data-index="${currentVideoIndex}"]`);
+  const wrapper = videoWrappers[currentVideoIndex];
   if (!wrapper) return;
   const video = wrapper.querySelector('.bg-video');
   if (video) {
@@ -206,6 +256,21 @@ function resumeAutoplay() {
 }
 
 // ========================================
+// Background preload: load all remaining videos after initial paint
+// ========================================
+
+function preloadAllRemaining() {
+  var i = 0;
+  function next() {
+    if (i >= totalVideos) return;
+    loadVideo(i);
+    i++;
+    setTimeout(next, 200);
+  }
+  next();
+}
+
+// ========================================
 // Initialize
 // ========================================
 
@@ -213,6 +278,7 @@ function init() {
   initMouseTracking();
   initTouchTracking();
   startAutoplay();
+  setTimeout(preloadAllRemaining, 2000);
 }
 
 if (document.readyState === 'loading') {
