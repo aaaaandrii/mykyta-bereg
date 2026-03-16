@@ -1201,6 +1201,7 @@ a {
     font-size: clamp(18px, 4.4vw, 53px);
     padding: 40px;
     margin: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .project-nav-arrow:hover,
