@@ -1023,10 +1023,12 @@ a {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
+    width: 100%;
   }
 
   .header-nav {
     gap: 5px;
+    margin-left: auto;
   }
 
   /* All fonts 2x bigger */
