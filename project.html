@@ -12,53 +12,57 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body class="page-project">
-    <div class="page-wrapper">
-      <header class="header" id="header">
-        <span onclick="navigateTo('index.html')" class="logo">Mykyta Bereg</span>
-        <div class="header-nav">
-          <span onclick="navigateTo('works.html')" class="nav-link">Works</span>
-          <span onclick="navigateTo('about.html')" class="nav-link">About</span>
-          <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+    <script>
+      function navigateTo(url) { window.location.href = url; }
+    </script>
+
+    <!-- Fullscreen background video -->
+    <div class="project-video-bg" id="videoBg">
+      <video id="projectVideo" class="project-video-fullscreen" playsinline muted loop>
+        <source src="" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+      <span onclick="navigateTo('index.html')" class="logo">Mykyta Bereg</span>
+      <div class="header-nav">
+        <span onclick="navigateTo('works.html')" class="nav-link">Works</span>
+        <span onclick="navigateTo('about.html')" class="nav-link">About</span>
+        <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+      </div>
+    </header>
+
+    <!-- Project title top-left -->
+    <div class="project-page-title-wrap">
+      <h1 class="project-page-title" id="projectTitle">Project Name</h1>
+      <span class="project-page-year" id="projectYear"></span>
+    </div>
+
+    <!-- Center info overlay (fades out after 2s) -->
+    <div class="project-center-info" id="centerInfo">
+      <h2 class="center-info-title" id="centerInfoTitle"></h2>
+      <p class="center-info-desc" id="centerInfoDesc"></p>
+    </div>
+
+    <!-- Bottom bar: credits + player controls -->
+    <div class="project-bottom-bar" id="projectBottomBar">
+      <div class="project-bottom-title" id="projectBottomTitle">
+        <span class="project-page-title" id="projectTitleMobile"></span>
+        <span class="project-page-year" id="projectYearMobile"></span>
+      </div>
+      <div class="project-bottom-credits">
+        <div class="project-credit-bl" id="creditDirector">
+          <span class="credit-label">Director</span>
+          <span class="credit-value" id="projectDirector">Name</span>
         </div>
-      </header>
-
-      <script>
-        function navigateTo(url) { window.location.href = url; }
-      </script>
-
-      <!-- Fullscreen background video -->
-      <div class="project-video-bg" id="videoBg">
-        <video id="projectVideo" class="project-video-fullscreen" playsinline muted loop>
-          <source src="" type="video/mp4">
-        </video>
-      </div>
-
-      <!-- Project title top-left -->
-      <div class="project-page-title-wrap">
-        <h1 class="project-page-title" id="projectTitle">Project Name</h1>
-        <span class="project-page-year" id="projectYear"></span>
-      </div>
-
-      <!-- Center info overlay (fades out after 2s) -->
-      <div class="project-center-info" id="centerInfo">
-        <h2 class="center-info-title" id="centerInfoTitle"></h2>
-        <p class="center-info-desc" id="centerInfoDesc"></p>
-      </div>
-
-      <!-- Bottom bar: credits + player controls -->
-      <div class="project-bottom-bar" id="projectBottomBar">
-        <div class="project-bottom-credits">
-          <div class="project-credit-bl" id="creditDirector">
-            <span class="credit-label">Director</span>
-            <span class="credit-value" id="projectDirector">Name</span>
-          </div>
-          <div class="project-credit-br" id="creditProduction">
-            <span class="credit-label">Production</span>
-            <span class="credit-value" id="projectProduction">Name</span>
-          </div>
+        <div class="project-credit-br" id="creditProduction">
+          <span class="credit-label">Production</span>
+          <span class="credit-value" id="projectProduction">Name</span>
         </div>
+      </div>
 
-        <div class="project-player-controls" id="playerControls">
+      <div class="project-player-controls" id="playerControls">
         <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
           <svg class="icon-play" width="14" height="14" viewBox="0 0 14 14" fill="white" style="display:none;">
             <path d="M2 0L13 7L2 14V0Z"/>
@@ -95,7 +99,6 @@
             <path d="M14 14H9.5V12.5H12.5V9.5H14V14Z"/>
           </svg>
         </button>
-        </div>
       </div>
     </div>
 
@@ -110,6 +113,8 @@
         document.title = project.name + ' — Mykyta Bereg';
         document.getElementById('projectTitle').textContent = project.name;
         document.getElementById('projectYear').textContent = project.year;
+        document.getElementById('projectTitleMobile').textContent = project.name;
+        document.getElementById('projectYearMobile').textContent = project.year;
         document.getElementById('projectDirector').textContent = project.director;
         document.getElementById('projectProduction').textContent = project.production;
 
@@ -225,11 +230,15 @@
 
         syncVolIcon();
 
-        // Fullscreen
+        // Fullscreen (with Safari webkit prefix)
         fsBtn.onclick = function(e) {
           e.stopPropagation();
-          if (document.fullscreenElement) document.exitFullscreen();
-          else document.getElementById('videoBg').requestFullscreen();
+          var el = document.getElementById('videoBg');
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+          } else {
+            (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+          }
         };
 
         // Click outside video/controls to go back
