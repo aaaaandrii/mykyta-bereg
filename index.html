@@ -33,7 +33,6 @@
       <!-- Project Info - Bottom -->
       <div class="project-info">
         <div class="project-name" id="projectName"></div>
-        <div class="project-year" id="projectYear"></div>
       </div>
     </div>
 
@@ -41,5 +40,43 @@
 
     <script src="./projects-data.js"></script>
     <script src="./script.js"></script>
+    <script>
+      (function() {
+        var logo = document.querySelector('.logo');
+        var nav = document.querySelector('.header-nav');
+        var projectInfo = document.querySelector('.project-info');
+        var copyright = document.querySelector('.copyright');
+
+        // Hide nav, project info, copyright initially
+        nav.style.opacity = '0';
+        nav.style.transition = 'opacity 0.8s ease';
+        if (projectInfo) { projectInfo.style.opacity = '0'; projectInfo.style.transition = 'opacity 0.8s ease'; }
+        if (copyright) { copyright.style.opacity = '0'; copyright.style.transition = 'opacity 0.8s ease'; }
+
+        // Start logo centered vertically
+        logo.style.position = 'fixed';
+        logo.style.top = '50%';
+        logo.style.left = '50%';
+        logo.style.transform = 'translate(-50%, -50%)';
+        logo.style.transition = 'none';
+        logo.style.zIndex = '200';
+
+        // After a brief pause, animate logo to its header position
+        setTimeout(function() {
+          logo.style.transition = 'top 1s ease, transform 1s ease';
+          logo.style.top = '5pt';
+          logo.style.transform = 'translateX(-50%)';
+        }, 800);
+
+        // After logo arrives, fade in nav and other elements
+        setTimeout(function() {
+          logo.style.position = '';
+          logo.style.zIndex = '';
+          nav.style.opacity = '1';
+          if (projectInfo) projectInfo.style.opacity = '1';
+          if (copyright) copyright.style.opacity = '1';
+        }, 1900);
+      })();
+    </script>
   </body>
 </html>

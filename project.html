@@ -26,84 +26,75 @@
         function navigateTo(url) { window.location.href = url; }
       </script>
 
+      <!-- Fullscreen background video -->
+      <div class="project-video-bg" id="videoBg">
+        <video id="projectVideo" class="project-video-fullscreen" playsinline muted loop>
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+
+      <!-- Project title top-left -->
       <div class="project-page-title-wrap">
         <h1 class="project-page-title" id="projectTitle">Project Name</h1>
         <span class="project-page-year" id="projectYear"></span>
       </div>
 
-      <div class="project-layout" id="projectLayout">
-        <div class="project-col-player">
-          <div class="video-container" id="videoContainer">
-            <video id="projectVideo" class="project-video" playsinline>
-              <source src="" type="video/mp4">
-            </video>
-            <div class="video-overlay" id="videoOverlay">
-              <button class="play-btn-overlay" id="playBtnOverlay">
-                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                  <circle cx="32" cy="32" r="31" stroke="white" stroke-width="1.5" opacity="0.8"/>
-                  <path d="M26 20L46 32L26 44V20Z" fill="white" opacity="0.9"/>
-                </svg>
-              </button>
-            </div>
+      <!-- Center info overlay (fades out after 2s) -->
+      <div class="project-center-info" id="centerInfo">
+        <h2 class="center-info-title" id="centerInfoTitle"></h2>
+        <p class="center-info-desc" id="centerInfoDesc"></p>
+      </div>
+
+      <!-- Bottom bar: credits + player controls -->
+      <div class="project-bottom-bar" id="projectBottomBar">
+        <div class="project-bottom-credits">
+          <div class="project-credit-bl" id="creditDirector">
+            <span class="credit-label">Director</span>
+            <span class="credit-value" id="projectDirector">Name</span>
           </div>
-
-          <div class="player-controls" id="playerControls">
-            <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
-              <svg class="icon-play" width="14" height="14" viewBox="0 0 14 14" fill="white">
-                <path d="M2 0L13 7L2 14V0Z"/>
-              </svg>
-              <svg class="icon-pause" width="14" height="14" viewBox="0 0 14 14" fill="white" style="display:none;">
-                <rect x="1" y="0" width="4" height="14"/>
-                <rect x="9" y="0" width="4" height="14"/>
-              </svg>
-            </button>
-
-            <span class="ctrl-time" id="timeCurrent">00:00</span>
-
-            <input type="range" class="scrubber-range" id="scrubberRange" min="0" max="1000" value="0" step="1">
-
-            <span class="ctrl-time" id="timeDuration">00:00</span>
-
-            <div class="volume-group" id="volumeGroup">
-              <button class="ctrl-btn" id="volumeBtn" title="Mute/Unmute">
-                <svg class="icon-vol-on" width="16" height="14" viewBox="0 0 16 14" fill="white">
-                  <path d="M0 4.5H3L7 0.5V13.5L3 9.5H0V4.5Z"/>
-                  <path d="M10 2.5C11.3 3.5 12 5.2 12 7C12 8.8 11.3 10.5 10 11.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                  <path d="M10 5C10.6 5.5 11 6.2 11 7C11 7.8 10.6 8.5 10 9" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                </svg>
-                <svg class="icon-vol-off" width="16" height="14" viewBox="0 0 16 14" fill="white" style="display:none;">
-                  <path d="M0 4.5H3L7 0.5V13.5L3 9.5H0V4.5Z"/>
-                  <path d="M10 4.5L15 9.5M15 4.5L10 9.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                </svg>
-              </button>
-              <div class="volume-slider-wrap">
-                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100" step="1">
-              </div>
-            </div>
-
-            <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
-                <path d="M0 0H4.5V1.5H1.5V4.5H0V0Z"/>
-                <path d="M14 0H9.5V1.5H12.5V4.5H14V0Z"/>
-                <path d="M0 14H4.5V12.5H1.5V9.5H0V14Z"/>
-                <path d="M14 14H9.5V12.5H12.5V9.5H14V14Z"/>
-              </svg>
-            </button>
+          <div class="project-credit-br" id="creditProduction">
+            <span class="credit-label">Production</span>
+            <span class="credit-value" id="projectProduction">Name</span>
           </div>
         </div>
 
-        <div class="project-col-credits" id="projectCredits">
-          <div class="credit-description" id="projectDescription"></div>
-          <div class="credit-bottom">
-            <div class="credit-block">
-              <span class="credit-label">Director</span>
-              <span class="credit-value" id="projectDirector">Name</span>
-            </div>
-            <div class="credit-block">
-              <span class="credit-label">Production</span>
-              <span class="credit-value" id="projectProduction">Name</span>
-            </div>
-          </div>
+        <div class="project-player-controls" id="playerControls">
+        <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">
+          <svg class="icon-play" width="14" height="14" viewBox="0 0 14 14" fill="white" style="display:none;">
+            <path d="M2 0L13 7L2 14V0Z"/>
+          </svg>
+          <svg class="icon-pause" width="14" height="14" viewBox="0 0 14 14" fill="white">
+            <rect x="1" y="0" width="4" height="14"/>
+            <rect x="9" y="0" width="4" height="14"/>
+          </svg>
+        </button>
+
+        <span class="ctrl-time" id="timeCurrent">00:00</span>
+
+        <input type="range" class="scrubber-range" id="scrubberRange" min="0" max="1000" value="0" step="1">
+
+        <span class="ctrl-time" id="timeDuration">00:00</span>
+
+        <button class="ctrl-btn" id="volumeBtn" title="Mute/Unmute">
+          <svg class="icon-vol-on" width="16" height="14" viewBox="0 0 16 14" fill="white" style="display:none;">
+            <path d="M0 4.5H3L7 0.5V13.5L3 9.5H0V4.5Z"/>
+            <path d="M10 2.5C11.3 3.5 12 5.2 12 7C12 8.8 11.3 10.5 10 11.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M10 5C10.6 5.5 11 6.2 11 7C11 7.8 10.6 8.5 10 9" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-vol-off" width="16" height="14" viewBox="0 0 16 14" fill="white">
+            <path d="M0 4.5H3L7 0.5V13.5L3 9.5H0V4.5Z"/>
+            <path d="M10 4.5L15 9.5M15 4.5L10 9.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
+            <path d="M0 0H4.5V1.5H1.5V4.5H0V0Z"/>
+            <path d="M14 0H9.5V1.5H12.5V4.5H14V0Z"/>
+            <path d="M0 14H4.5V12.5H1.5V9.5H0V14Z"/>
+            <path d="M14 14H9.5V12.5H12.5V9.5H14V14Z"/>
+          </svg>
+        </button>
         </div>
       </div>
     </div>
@@ -121,11 +112,14 @@
         document.getElementById('projectYear').textContent = project.year;
         document.getElementById('projectDirector').textContent = project.director;
         document.getElementById('projectProduction').textContent = project.production;
-        document.getElementById('projectDescription').textContent = project.description || '';
-        document.querySelector('#projectVideo source').src = project.video;
+
+        // Center info overlay
+        document.getElementById('centerInfoTitle').textContent = project.name;
+        document.getElementById('centerInfoDesc').textContent = project.description || '';
+
+        document.querySelector('#projectVideo source').src = project.videoFull || project.video;
 
         var video = document.getElementById('projectVideo');
-        var overlay = document.getElementById('videoOverlay');
         var scrubber = document.getElementById('scrubberRange');
         var timeCur = document.getElementById('timeCurrent');
         var timeDur = document.getElementById('timeDuration');
@@ -136,10 +130,21 @@
         var iconVolOn = volBtn.querySelector('.icon-vol-on');
         var iconVolOff = volBtn.querySelector('.icon-vol-off');
         var fsBtn = document.getElementById('fullscreenBtn');
+        var centerInfo = document.getElementById('centerInfo');
 
         video.load();
         video.muted = true;
         video.volume = 1;
+
+        // Autoplay muted
+        video.addEventListener('loadeddata', function() {
+          video.play().catch(function() {});
+        });
+
+        // Fade out center info after 1 second
+        setTimeout(function() {
+          centerInfo.classList.add('fade-out');
+        }, 2000);
 
         function fmt(s) {
           var m = Math.floor(s / 60);
@@ -147,7 +152,6 @@
           return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
         }
 
-        // Scrubber: update position as video plays
         var scrubbing = false;
 
         function syncFill() {
@@ -165,7 +169,6 @@
           timeDur.textContent = fmt(video.duration);
         });
 
-        // Scrubber: user drags or clicks
         scrubber.addEventListener('input', function() {
           scrubbing = true;
           syncFill();
@@ -182,42 +185,30 @@
         function togglePlay() {
           if (video.paused) {
             video.play();
-            overlay.classList.add('hidden');
             iconPlay.style.display = 'none';
             iconPause.style.display = 'block';
           } else {
             video.pause();
-            overlay.classList.remove('hidden');
             iconPlay.style.display = 'block';
             iconPause.style.display = 'none';
           }
         }
 
-        document.getElementById('playBtnOverlay').onclick = function(e) { e.stopPropagation(); togglePlay(); };
-        overlay.onclick = function(e) { e.stopPropagation(); togglePlay(); };
         video.onclick = function(e) { e.stopPropagation(); togglePlay(); };
         playPauseBtn.onclick = function(e) { e.stopPropagation(); togglePlay(); };
 
         video.addEventListener('ended', function() {
-          overlay.classList.remove('hidden');
           iconPlay.style.display = 'block';
           iconPause.style.display = 'none';
         });
 
-        // Volume
-        var volSlider = document.getElementById('volumeSlider');
+        // Volume mute/unmute
         var savedVol = 1;
 
         function syncVolIcon() {
           var muted = video.muted || video.volume === 0;
           iconVolOn.style.display = muted ? 'none' : 'block';
           iconVolOff.style.display = muted ? 'block' : 'none';
-        }
-
-        function syncVolFill() {
-          var pct = video.muted ? 0 : Math.round(video.volume * 100);
-          volSlider.value = pct;
-          volSlider.style.setProperty('--vol', pct + '%');
         }
 
         volBtn.onclick = function(e) {
@@ -230,42 +221,29 @@
             video.muted = true;
           }
           syncVolIcon();
-          syncVolFill();
         };
 
-        volSlider.addEventListener('input', function(e) {
-          e.stopPropagation();
-          var v = volSlider.value / 100;
-          video.volume = v;
-          video.muted = v === 0;
-          savedVol = v || savedVol;
-          syncVolIcon();
-          volSlider.style.setProperty('--vol', volSlider.value + '%');
-        });
-
-        volSlider.addEventListener('mousedown', function(e) { e.stopPropagation(); });
-        volSlider.addEventListener('change', function(e) { e.stopPropagation(); });
+        syncVolIcon();
 
         // Fullscreen
         fsBtn.onclick = function(e) {
           e.stopPropagation();
           if (document.fullscreenElement) document.exitFullscreen();
-          else document.getElementById('videoContainer').requestFullscreen();
+          else document.getElementById('videoBg').requestFullscreen();
         };
 
-        // Click outside to close — use mousedown instead of click to avoid conflicts with range input
-        var closeZones = document.querySelectorAll('.page-project');
+        // Click outside video/controls to go back
         document.addEventListener('mousedown', function(e) {
           var t = e.target;
-          // If the click is on the range input or any control, do nothing
           if (t === scrubber) return;
-          if (document.getElementById('projectLayout').contains(t)) return;
+          if (t === video) return;
+          if (document.getElementById('projectBottomBar').contains(t)) return;
           if (document.getElementById('header').contains(t)) return;
           if (t.closest('.project-page-title-wrap')) return;
+          if (t.closest('.project-center-info')) return;
           history.back();
         });
       })();
     </script>
-    <div class="copyright">All Rights Reserved 2026</div>
   </body>
 </html>

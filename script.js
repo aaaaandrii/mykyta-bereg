@@ -97,12 +97,8 @@ function showVideo(index) {
 }
 
 function initMouseTracking() {
-  const firstVideo = videoWrappers[0]?.querySelector('.bg-video');
-  if (firstVideo) {
-    firstVideo.play().catch(() => {});
-    if (projectNameEl) projectNameEl.textContent = projects[0].name;
-    if (projectYearEl) projectYearEl.textContent = projects[0].year;
-  }
+  var startIndex = Math.floor(Math.random() * totalVideos);
+  showVideo(startIndex);
 
   document.addEventListener('mousemove', (e) => {
     const now = Date.now();

@@ -53,12 +53,24 @@
         </div>
       </div>
 
-      <!-- Social Links - Bottom -->
-      <div class="social-links">
+      <!-- Social Links - Bottom Center -->
+      <div class="social-links social-links-center">
         <a href="http://instagram.com/oveay" target="_blank" rel="noreferrer" class="social-link">Instagram</a>
         <a href="https://vimeo.com/oveay" target="_blank" rel="noreferrer" class="social-link">Vimeo</a>
       </div>
     </div>
-    <div class="copyright">All Rights Reserved 2026</div>
+
+    <script>
+      (function() {
+        var columns = document.querySelectorAll('.contact-column');
+        columns.forEach(function(col, i) {
+          col.style.opacity = '0';
+          col.style.transition = 'opacity 1s ease';
+          setTimeout(function() {
+            col.style.opacity = '1';
+          }, i * 500);
+        });
+      })();
+    </script>
   </body>
 </html>

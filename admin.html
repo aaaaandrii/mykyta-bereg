@@ -443,8 +443,12 @@
                   <input type="text" value="${esc(p.description || '')}" oninput="updateField(${i}, 'description', this.value)" placeholder="Project description" />
                 </div>
                 <div class="form-group full-width">
-                  <label>Video File Path</label>
+                  <label>Preview Video (main page / works page)</label>
                   <input type="text" value="${esc(p.video)}" oninput="updateField(${i}, 'video', this.value)" placeholder="./videos/filename.mp4" />
+                </div>
+                <div class="form-group full-width">
+                  <label>Full Video URL (project page — leave empty to use preview)</label>
+                  <input type="text" value="${esc(p.videoFull || '')}" oninput="updateField(${i}, 'videoFull', this.value)" placeholder="https://your-r2-bucket.r2.dev/full-video.mp4" />
                 </div>
                 <div class="video-preview">
                   <video src="${esc(p.video)}" muted controls preload="metadata"></video>
@@ -513,6 +517,7 @@
           name: 'New Project',
           year: new Date().getFullYear().toString(),
           video: './videos/',
+          videoFull: '',
           director: 'Director Name',
           production: 'Production Name',
           description: ''
