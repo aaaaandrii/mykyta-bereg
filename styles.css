@@ -1199,8 +1199,23 @@ a {
 
   .project-nav-arrow {
     font-size: clamp(18px, 4.4vw, 53px);
-    padding: 40px 40px;
-    margin: -40px -40px;
+    padding: 40px;
+    margin: 0;
+  }
+
+  .project-nav-arrow:hover,
+  .project-nav-arrow:active {
+    opacity: 1;
+  }
+
+  .page-project .project-nav-prev {
+    left: 0;
+    padding-left: 5pt;
+  }
+
+  .page-project .project-nav-next {
+    right: 0;
+    padding-right: 5pt;
   }
 }
 
