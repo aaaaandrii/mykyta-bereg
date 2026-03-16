@@ -230,14 +230,19 @@
 
         syncVolIcon();
 
-        // Fullscreen (with Safari webkit prefix)
+        // Fullscreen (iOS uses webkitEnterFullscreen on video element)
         fsBtn.onclick = function(e) {
           e.stopPropagation();
-          var el = document.getElementById('videoBg');
           if (document.fullscreenElement || document.webkitFullscreenElement) {
             (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+          } else if (video.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+          } else if (video.requestFullscreen) {
+            video.requestFullscreen();
           } else {
-            (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+            var el = document.getElementById('videoBg');
+            if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            else if (el.requestFullscreen) el.requestFullscreen();
           }
         };
 
