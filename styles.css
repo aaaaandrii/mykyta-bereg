@@ -1196,6 +1196,12 @@ a {
   .center-info-desc {
     max-width: 80vw;
   }
+
+  .project-nav-arrow {
+    font-size: clamp(18px, 4.4vw, 53px);
+    padding: 40px 40px;
+    margin: -40px -40px;
+  }
 }
 
 @media (max-width: 480px) {
