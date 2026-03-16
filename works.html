@@ -58,36 +58,48 @@
       const worksVideoLoaded = new Set();
       const worksPosterCache = {};
 
-      function loadWorksVideo(idx) {
-        if (worksVideoLoaded.has(idx)) return;
+      function loadWorksVideo(idx, autoplay) {
         var video = worksVideos[idx];
         if (!video) return;
-        var src = video.dataset.src;
-        if (!src) return;
-        if (!video.querySelector('source')) {
-          var source = document.createElement('source');
-          source.src = src;
-          source.type = 'video/mp4';
-          video.appendChild(source);
-        }
-        video.preload = 'metadata';
-        video.load();
-        worksVideoLoaded.add(idx);
 
-        video.addEventListener('loadeddata', function cap() {
-          video.removeEventListener('loadeddata', cap);
-          try {
-            var scale = _mobile ? 0.25 : 0.5;
-            var c = document.createElement('canvas');
-            c.width = video.videoWidth * scale;
-            c.height = video.videoHeight * scale;
-            c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-            worksPosterCache[idx] = c.toDataURL('image/jpeg', _mobile ? 0.5 : 0.7);
-            video.style.backgroundImage = 'url(' + worksPosterCache[idx] + ')';
-            video.style.backgroundSize = 'cover';
-            video.style.backgroundPosition = 'center';
-          } catch (e) {}
-        }, { once: true });
+        if (!worksVideoLoaded.has(idx)) {
+          var src = video.dataset.src;
+          if (!src) return;
+          if (!video.querySelector('source')) {
+            var source = document.createElement('source');
+            source.src = src;
+            source.type = 'video/mp4';
+            video.appendChild(source);
+          }
+          video.preload = 'auto';
+          video.load();
+          worksVideoLoaded.add(idx);
+
+          video.addEventListener('loadeddata', function cap() {
+            video.removeEventListener('loadeddata', cap);
+            try {
+              var scale = _mobile ? 0.25 : 0.5;
+              var c = document.createElement('canvas');
+              c.width = video.videoWidth * scale;
+              c.height = video.videoHeight * scale;
+              c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+              worksPosterCache[idx] = c.toDataURL('image/jpeg', _mobile ? 0.5 : 0.7);
+              video.style.backgroundImage = 'url(' + worksPosterCache[idx] + ')';
+              video.style.backgroundSize = 'cover';
+              video.style.backgroundPosition = 'center';
+            } catch (e) {}
+            if (autoplay && video.classList.contains('active')) {
+              video.play().catch(function() {});
+            }
+          }, { once: true });
+        }
+
+        if (autoplay) {
+          video.preload = 'auto';
+          if (video.readyState >= 2) {
+            video.play().catch(function() {});
+          }
+        }
       }
 
       function unloadWorksVideo(idx) {
@@ -166,7 +178,6 @@
         const prevVideoIndex = parseInt(worksItems[currentIndex].dataset.video);
 
         if (videoIndex !== prevVideoIndex) {
-          loadWorksVideo(videoIndex);
           var next1 = (videoIndex + 1) % totalVideos;
           var prev1 = (videoIndex - 1 + totalVideos) % totalVideos;
           loadWorksVideo(next1);
@@ -179,10 +190,10 @@
             }
             if (i === videoIndex) {
               video.classList.add('active');
-              video.preload = 'auto';
-              video.play().catch(() => {});
             }
           });
+
+          loadWorksVideo(videoIndex, true);
 
           if (_mobile) {
             worksVideos.forEach((video, i) => {
@@ -225,11 +236,9 @@
 
       function init() {
         centerActiveItem(startIndex);
-        loadWorksVideo(0);
         loadWorksVideo(1);
         worksVideos[0].classList.add('active');
-        worksVideos[0].preload = 'auto';
-        worksVideos[0].play().catch(() => {});
+        loadWorksVideo(0, true);
         if (!_mobile) {
           var i = 0;
           function preloadNext() {
