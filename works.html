@@ -39,22 +39,69 @@
     <script>
       const projects = getProjects();
       const totalVideos = projects.length;
+      const _mobile = 'ontouchstart' in window || window.innerWidth <= 768;
 
-      // Generate background videos
+      // Generate background videos (lazy - no source yet)
       const videoBgContainer = document.getElementById('worksVideoBg');
       projects.forEach((p, i) => {
         const video = document.createElement('video');
-        video.className = 'works-video' + (i === 0 ? ' active' : '');
+        video.className = 'works-video';
         video.dataset.index = i;
+        video.dataset.src = p.video;
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        const source = document.createElement('source');
-        source.src = p.video;
-        source.type = 'video/mp4';
-        video.appendChild(source);
+        video.preload = 'none';
         videoBgContainer.appendChild(video);
       });
+
+      const worksVideoLoaded = new Set();
+      const worksPosterCache = {};
+
+      function loadWorksVideo(idx) {
+        if (worksVideoLoaded.has(idx)) return;
+        var video = worksVideos[idx];
+        if (!video) return;
+        var src = video.dataset.src;
+        if (!src) return;
+        if (!video.querySelector('source')) {
+          var source = document.createElement('source');
+          source.src = src;
+          source.type = 'video/mp4';
+          video.appendChild(source);
+        }
+        video.preload = 'metadata';
+        video.load();
+        worksVideoLoaded.add(idx);
+
+        video.addEventListener('loadeddata', function cap() {
+          video.removeEventListener('loadeddata', cap);
+          try {
+            var scale = _mobile ? 0.25 : 0.5;
+            var c = document.createElement('canvas');
+            c.width = video.videoWidth * scale;
+            c.height = video.videoHeight * scale;
+            c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+            worksPosterCache[idx] = c.toDataURL('image/jpeg', _mobile ? 0.5 : 0.7);
+            video.style.backgroundImage = 'url(' + worksPosterCache[idx] + ')';
+            video.style.backgroundSize = 'cover';
+            video.style.backgroundPosition = 'center';
+          } catch (e) {}
+        }, { once: true });
+      }
+
+      function unloadWorksVideo(idx) {
+        if (!worksPosterCache[idx]) return;
+        var video = worksVideos[idx];
+        if (!video) return;
+        video.pause();
+        video.removeAttribute('src');
+        var s = video.querySelector('source');
+        if (s) s.removeAttribute('src');
+        video.load();
+        video.preload = 'none';
+        worksVideoLoaded.delete(idx);
+      }
 
       // Generate works list (5 sets for infinite scroll)
       const worksList = document.getElementById('worksList');
@@ -125,6 +172,12 @@
         const prevVideoIndex = parseInt(worksItems[currentIndex].dataset.video);
 
         if (videoIndex !== prevVideoIndex) {
+          loadWorksVideo(videoIndex);
+          var next1 = (videoIndex + 1) % totalVideos;
+          var prev1 = (videoIndex - 1 + totalVideos) % totalVideos;
+          loadWorksVideo(next1);
+          loadWorksVideo(prev1);
+
           worksVideos.forEach((video, i) => {
             if (i === prevVideoIndex) {
               video.classList.remove('active');
@@ -132,9 +185,18 @@
             }
             if (i === videoIndex) {
               video.classList.add('active');
+              video.preload = 'auto';
               video.play().catch(() => {});
             }
           });
+
+          if (_mobile) {
+            worksVideos.forEach((video, i) => {
+              if (i === videoIndex || i === next1 || i === prev1) return;
+              var dist = Math.min(Math.abs(i - videoIndex), totalVideos - Math.abs(i - videoIndex));
+              if (dist > 2 && worksPosterCache[i]) unloadWorksVideo(i);
+            });
+          }
         }
 
         currentIndex = index;
@@ -174,7 +236,21 @@
 
       function init() {
         centerActiveItem(startIndex);
+        loadWorksVideo(0);
+        loadWorksVideo(1);
+        worksVideos[0].classList.add('active');
+        worksVideos[0].preload = 'auto';
         worksVideos[0].play().catch(() => {});
+        if (!_mobile) {
+          var i = 0;
+          function preloadNext() {
+            if (i >= totalVideos) return;
+            loadWorksVideo(i);
+            i++;
+            setTimeout(preloadNext, 300);
+          }
+          setTimeout(preloadNext, 2000);
+        }
       }
 
       window.addEventListener('resize', () => {
