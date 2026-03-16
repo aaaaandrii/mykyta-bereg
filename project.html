@@ -39,6 +39,10 @@
       <span class="project-page-year" id="projectYear"></span>
     </div>
 
+    <!-- Project navigation arrows -->
+    <div class="project-nav-arrow project-nav-prev" id="navPrev">←</div>
+    <div class="project-nav-arrow project-nav-next" id="navNext">→</div>
+
     <!-- Center info overlay (fades out after 2s) -->
     <div class="project-center-info" id="centerInfo">
       <h2 class="center-info-title" id="centerInfoTitle"></h2>
@@ -106,9 +110,29 @@
     <script>
       (function() {
         var urlParams = new URLSearchParams(window.location.search);
-        var projectId = urlParams.get('id') || '0';
+        var projectId = parseInt(urlParams.get('id') || '0');
         var projects = getProjects();
-        var project = projects[parseInt(projectId)] || projects[0];
+        var project = projects[projectId] || projects[0];
+
+        var prevId = (projectId - 1 + projects.length) % projects.length;
+        var nextId = (projectId + 1) % projects.length;
+
+        document.getElementById('navPrev').onclick = function(e) {
+          e.stopPropagation();
+          window.location.href = 'project.html?id=' + prevId;
+        };
+        document.getElementById('navNext').onclick = function(e) {
+          e.stopPropagation();
+          window.location.href = 'project.html?id=' + nextId;
+        };
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowLeft') {
+            window.location.href = 'project.html?id=' + prevId;
+          } else if (e.key === 'ArrowRight') {
+            window.location.href = 'project.html?id=' + nextId;
+          }
+        });
 
         document.title = project.name + ' — Mykyta Bereg';
         document.getElementById('projectTitle').textContent = project.name;
@@ -255,6 +279,7 @@
           if (document.getElementById('header').contains(t)) return;
           if (t.closest('.project-page-title-wrap')) return;
           if (t.closest('.project-center-info')) return;
+          if (t.closest('.project-nav-arrow')) return;
           history.back();
         });
       })();

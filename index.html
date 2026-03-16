@@ -44,6 +44,9 @@
       (function() {
         var isMobile = window.innerWidth <= 768;
         if (isMobile) return;
+        if (sessionStorage.getItem('introPlayed')) return;
+
+        sessionStorage.setItem('introPlayed', '1');
 
         var logo = document.querySelector('.logo');
         var nav = document.querySelector('.header-nav');

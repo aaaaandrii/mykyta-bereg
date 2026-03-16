@@ -69,6 +69,10 @@
           setTimeout(function() {
             col.style.opacity = '1';
           }, i * 500);
+
+          col.addEventListener('mouseenter', function() {
+            col.classList.add('revealed');
+          });
         });
       })();
     </script>

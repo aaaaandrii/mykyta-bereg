@@ -127,8 +127,6 @@
       const startIndex = totalVideos * middleSet;
 
       let currentIndex = startIndex;
-      let isAnimating = false;
-      const animationDuration = 50;
 
       let velocity = 0;
       let lastScrollTime = 0;
@@ -154,10 +152,6 @@
         }
 
         if (index === currentIndex) return;
-
-        if (!skipAnimation) {
-          isAnimating = true;
-        }
 
         worksItems.forEach((item, i) => {
           item.classList.remove('active');
@@ -227,11 +221,6 @@
           });
         }
 
-        if (!skipAnimation) {
-          setTimeout(() => {
-            isAnimating = false;
-          }, animationDuration);
-        }
       }
 
       function init() {
@@ -262,7 +251,7 @@
           if (item.classList.contains('active')) {
             const videoIndex = parseInt(item.dataset.video);
             window.location.href = `project.html?id=${videoIndex}`;
-          } else if (!isAnimating) {
+          } else {
             setActiveItem(index);
           }
         });
@@ -276,7 +265,7 @@
         window.location.href = `project.html?id=${videoIndex}`;
       });
 
-      const scrollThreshold = 240;
+      const scrollThreshold = 168;
       let scrollAccumulator = 0;
 
       function processInertia() {
@@ -284,7 +273,7 @@
           velocity *= 0.85;
           scrollAccumulator += velocity;
 
-          if (Math.abs(scrollAccumulator) >= scrollThreshold && !isAnimating) {
+          if (Math.abs(scrollAccumulator) >= scrollThreshold) {
             if (scrollAccumulator > 0) {
               setActiveItem(currentIndex + 1);
             } else {
@@ -313,7 +302,7 @@
 
         scrollAccumulator += e.deltaY;
 
-        if (Math.abs(scrollAccumulator) >= scrollThreshold && !isAnimating) {
+        if (Math.abs(scrollAccumulator) >= scrollThreshold) {
           if (scrollAccumulator > 0) {
             setActiveItem(currentIndex + 1);
           } else {
@@ -326,7 +315,7 @@
       }, { passive: false });
 
       let touchStartY = 0;
-      const touchThreshold = 60;
+      const touchThreshold = 42;
 
       window.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
@@ -341,7 +330,7 @@
         const currentY = e.touches[0].clientY;
         const delta = touchStartY - currentY;
 
-        if (Math.abs(delta) >= touchThreshold && !isAnimating) {
+        if (Math.abs(delta) >= touchThreshold) {
           if (delta > 0) {
             setActiveItem(currentIndex + 1);
           } else {
@@ -356,7 +345,6 @@
       }, { passive: true });
 
       window.addEventListener('keydown', (e) => {
-        if (isAnimating) return;
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
           e.preventDefault();
           setActiveItem(currentIndex + 1);
