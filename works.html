@@ -41,79 +41,39 @@
       const totalVideos = projects.length;
       const _mobile = 'ontouchstart' in window || window.innerWidth <= 768;
 
-      // Generate background videos (lazy - no source yet)
+      // Generate background videos with sources — preload metadata for first frames
       const videoBgContainer = document.getElementById('worksVideoBg');
       projects.forEach((p, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'works-video-wrap';
+        wrapper.dataset.index = i;
         const video = document.createElement('video');
         video.className = 'works-video';
-        video.dataset.index = i;
-        video.dataset.src = p.video;
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.preload = 'none';
-        videoBgContainer.appendChild(video);
+        video.preload = 'metadata';
+        const source = document.createElement('source');
+        source.src = p.video;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        wrapper.appendChild(video);
+        videoBgContainer.appendChild(wrapper);
+
+        video.addEventListener('loadeddata', function cap() {
+          video.removeEventListener('loadeddata', cap);
+          try {
+            var scale = _mobile ? 0.25 : 0.5;
+            var c = document.createElement('canvas');
+            c.width = video.videoWidth * scale;
+            c.height = video.videoHeight * scale;
+            c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+            wrapper.style.backgroundImage = 'url(' + c.toDataURL('image/jpeg', _mobile ? 0.5 : 0.7) + ')';
+            wrapper.style.backgroundSize = 'cover';
+            wrapper.style.backgroundPosition = 'center';
+          } catch (e) {}
+        }, { once: true });
       });
-
-      const worksVideoLoaded = new Set();
-      const worksPosterCache = {};
-
-      function loadWorksVideo(idx, autoplay) {
-        var video = worksVideos[idx];
-        if (!video) return;
-
-        if (!worksVideoLoaded.has(idx)) {
-          var src = video.dataset.src;
-          if (!src) return;
-          if (!video.querySelector('source')) {
-            var source = document.createElement('source');
-            source.src = src;
-            source.type = 'video/mp4';
-            video.appendChild(source);
-          }
-          video.preload = 'auto';
-          video.load();
-          worksVideoLoaded.add(idx);
-
-          video.addEventListener('loadeddata', function cap() {
-            video.removeEventListener('loadeddata', cap);
-            try {
-              var scale = _mobile ? 0.25 : 0.5;
-              var c = document.createElement('canvas');
-              c.width = video.videoWidth * scale;
-              c.height = video.videoHeight * scale;
-              c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
-              worksPosterCache[idx] = c.toDataURL('image/jpeg', _mobile ? 0.5 : 0.7);
-              video.style.backgroundImage = 'url(' + worksPosterCache[idx] + ')';
-              video.style.backgroundSize = 'cover';
-              video.style.backgroundPosition = 'center';
-            } catch (e) {}
-            if (autoplay && video.classList.contains('active')) {
-              video.play().catch(function() {});
-            }
-          }, { once: true });
-        }
-
-        if (autoplay) {
-          video.preload = 'auto';
-          if (video.readyState >= 2) {
-            video.play().catch(function() {});
-          }
-        }
-      }
-
-      function unloadWorksVideo(idx) {
-        if (!worksPosterCache[idx]) return;
-        var video = worksVideos[idx];
-        if (!video) return;
-        video.pause();
-        video.removeAttribute('src');
-        var s = video.querySelector('source');
-        if (s) s.removeAttribute('src');
-        video.load();
-        video.preload = 'none';
-        worksVideoLoaded.delete(idx);
-      }
 
       // Generate works list (5 sets for infinite scroll)
       const worksList = document.getElementById('worksList');
@@ -133,6 +93,7 @@
       }
 
       const worksItems = document.querySelectorAll('.works-item');
+      const worksWrappers = document.querySelectorAll('.works-video-wrap');
       const worksVideos = document.querySelectorAll('.works-video');
 
       const totalItems = worksItems.length;
@@ -178,30 +139,18 @@
         const prevVideoIndex = parseInt(worksItems[currentIndex].dataset.video);
 
         if (videoIndex !== prevVideoIndex) {
-          var next1 = (videoIndex + 1) % totalVideos;
-          var prev1 = (videoIndex - 1 + totalVideos) % totalVideos;
-          loadWorksVideo(next1);
-          loadWorksVideo(prev1);
-
-          worksVideos.forEach((video, i) => {
+          worksWrappers.forEach((wrap, i) => {
+            var video = worksVideos[i];
             if (i === prevVideoIndex) {
-              video.classList.remove('active');
+              wrap.classList.remove('active');
               video.pause();
             }
             if (i === videoIndex) {
-              video.classList.add('active');
+              wrap.classList.add('active');
+              video.preload = 'auto';
+              video.play().catch(function() {});
             }
           });
-
-          loadWorksVideo(videoIndex, true);
-
-          if (_mobile) {
-            worksVideos.forEach((video, i) => {
-              if (i === videoIndex || i === next1 || i === prev1) return;
-              var dist = Math.min(Math.abs(i - videoIndex), totalVideos - Math.abs(i - videoIndex));
-              if (dist > 2 && worksPosterCache[i]) unloadWorksVideo(i);
-            });
-          }
         }
 
         currentIndex = index;
@@ -236,19 +185,9 @@
 
       function init() {
         centerActiveItem(startIndex);
-        loadWorksVideo(1);
-        worksVideos[0].classList.add('active');
-        loadWorksVideo(0, true);
-        if (!_mobile) {
-          var i = 0;
-          function preloadNext() {
-            if (i >= totalVideos) return;
-            loadWorksVideo(i);
-            i++;
-            setTimeout(preloadNext, 300);
-          }
-          setTimeout(preloadNext, 2000);
-        }
+        worksWrappers[0].classList.add('active');
+        worksVideos[0].preload = 'auto';
+        worksVideos[0].play().catch(function() {});
       }
 
       window.addEventListener('resize', () => {
