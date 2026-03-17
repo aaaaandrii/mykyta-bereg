@@ -63,15 +63,20 @@
     <script>
       (function() {
         var columns = document.querySelectorAll('.contact-column');
-        columns.forEach(function(col, i) {
+        columns.forEach(function(col) {
           col.style.opacity = '0';
-          col.style.transition = 'opacity 1s ease';
-          setTimeout(function() {
-            col.style.opacity = '1';
-          }, i * 500);
-
           col.addEventListener('mouseenter', function() {
             col.classList.add('revealed');
+          });
+        });
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            columns.forEach(function(col, i) {
+              col.style.transition = 'opacity 1s ease';
+              setTimeout(function() {
+                col.style.opacity = '1';
+              }, i * 500);
+            });
           });
         });
       })();

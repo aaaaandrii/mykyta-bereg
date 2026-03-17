@@ -1212,20 +1212,6 @@ a {
     font-size: 10px;
   }
 
-  .page-works .copyright::before {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    mask-image: linear-gradient(to top, black 0%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
-    pointer-events: none;
-    z-index: -1;
-  }
 
   /* Project page */
   .page-project .project-page-title-wrap {
