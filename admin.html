@@ -290,6 +290,82 @@
         object-fit: contain;
       }
 
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 0.15s ease;
+      }
+      .section-header:hover { border-color: #333; }
+      .section-header h2 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #ccc;
+      }
+      .section-header h2 .count {
+        color: #555;
+        font-weight: 400;
+      }
+
+      .admin-section {
+        margin-bottom: 24px;
+        padding: 0 4px;
+      }
+
+      .form-group textarea {
+        background: #0a0a0a;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-size: 14px;
+        color: #e0e0e0;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.15s ease;
+        width: 100%;
+        resize: vertical;
+      }
+      .form-group textarea:focus { border-color: #555; }
+
+      .contact-row, .social-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .contact-row input, .social-row input {
+        background: #0a0a0a;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-size: 14px;
+        color: #e0e0e0;
+        font-family: inherit;
+        outline: none;
+        flex: 1;
+        transition: border-color 0.15s ease;
+      }
+      .contact-row input:focus, .social-row input:focus { border-color: #555; }
+      .contact-row input:first-child { max-width: 80px; }
+      .social-row input:first-child { max-width: 140px; }
+      .row-delete {
+        background: none;
+        border: none;
+        color: #555;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 4px 8px;
+        transition: color 0.15s ease;
+      }
+      .row-delete:hover { color: #ff6b6b; }
+
       .toast {
         position: fixed;
         bottom: 24px;
@@ -332,11 +408,49 @@
     </div>
 
     <div class="admin-content">
-      <div class="status-bar">
-        <span><span class="count" id="projectCount">0</span> projects</span>
-        <span id="statusText">Loading...</span>
+      <!-- About Section -->
+      <div class="section-header" onclick="toggleSection('aboutSection')">
+        <h2>About Page</h2>
+        <span class="expand-icon">▾</span>
       </div>
-      <div id="projectList"></div>
+      <div class="admin-section" id="aboutSection" style="display:none;">
+        <div class="form-group full-width">
+          <label>Bio Text (HTML allowed — use &lt;em&gt; for italics)</label>
+          <textarea id="aboutBioInput" rows="4" oninput="markUnsaved()"></textarea>
+        </div>
+      </div>
+
+      <!-- Contact Section -->
+      <div class="section-header" onclick="toggleSection('contactSection')">
+        <h2>Contact Page</h2>
+        <span class="expand-icon">▾</span>
+      </div>
+      <div class="admin-section" id="contactSection" style="display:none;">
+        <div id="contactList"></div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-secondary btn-small" onclick="addContact()">+ Add Region</button>
+        </div>
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid #222;">
+          <label style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#666; font-weight:500; display:block; margin-bottom:8px;">Social Links</label>
+          <div id="socialList"></div>
+          <div style="margin-top:8px;">
+            <button class="btn btn-secondary btn-small" onclick="addSocial()">+ Add Social Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Section -->
+      <div class="section-header" onclick="toggleSection('projectsSection')">
+        <h2>Projects <span class="count" id="projectCount">0</span></h2>
+        <span class="expand-icon">▾</span>
+      </div>
+      <div class="admin-section" id="projectsSection">
+        <div class="status-bar">
+          <span><span class="count" id="projectCount2">0</span> projects</span>
+          <span id="statusText">Loading...</span>
+        </div>
+        <div id="projectList"></div>
+      </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -380,14 +494,80 @@
     <script src="./projects-data.js"></script>
     <script>
       let projects = getProjects();
+      let aboutData = getAbout();
+      let contactsData = getContacts();
+      let socialsData = getSocials();
       let videoFiles = [];
 
-      // Scan for available video files
       async function loadVideoFiles() {
         const known = DEFAULT_PROJECTS.map(p => p.video);
         const stored = projects.map(p => p.video);
         const all = new Set([...known, ...stored]);
         videoFiles = [...all].sort();
+      }
+
+      function toggleSection(id) {
+        var el = document.getElementById(id);
+        var header = el.previousElementSibling;
+        if (el.style.display === 'none') {
+          el.style.display = '';
+          header.querySelector('.expand-icon').style.transform = 'rotate(180deg)';
+        } else {
+          el.style.display = 'none';
+          header.querySelector('.expand-icon').style.transform = '';
+        }
+      }
+
+      function markUnsaved() {
+        document.getElementById('statusText').textContent = 'Unsaved changes';
+      }
+
+      // About
+      function renderAbout() {
+        document.getElementById('aboutBioInput').value = aboutData.bio;
+      }
+
+      // Contacts
+      function renderContacts() {
+        var list = document.getElementById('contactList');
+        list.innerHTML = '';
+        contactsData.forEach(function(c, i) {
+          var row = document.createElement('div');
+          row.className = 'contact-row';
+          row.innerHTML =
+            '<input type="text" value="' + esc(c.region) + '" placeholder="Region" oninput="contactsData[' + i + '].region=this.value;markUnsaved()">' +
+            '<input type="text" value="' + esc(c.email) + '" placeholder="Email" oninput="contactsData[' + i + '].email=this.value;markUnsaved()">' +
+            '<input type="text" value="' + esc(c.phone) + '" placeholder="Phone" oninput="contactsData[' + i + '].phone=this.value;markUnsaved()">' +
+            '<button class="row-delete" onclick="contactsData.splice(' + i + ',1);renderContacts();markUnsaved()">×</button>';
+          list.appendChild(row);
+        });
+      }
+
+      function addContact() {
+        contactsData.push({ region: '', email: '', phone: '' });
+        renderContacts();
+        markUnsaved();
+      }
+
+      // Socials
+      function renderSocials() {
+        var list = document.getElementById('socialList');
+        list.innerHTML = '';
+        socialsData.forEach(function(s, i) {
+          var row = document.createElement('div');
+          row.className = 'social-row';
+          row.innerHTML =
+            '<input type="text" value="' + esc(s.name) + '" placeholder="Name" oninput="socialsData[' + i + '].name=this.value;markUnsaved()">' +
+            '<input type="text" value="' + esc(s.url) + '" placeholder="URL" oninput="socialsData[' + i + '].url=this.value;markUnsaved()">' +
+            '<button class="row-delete" onclick="socialsData.splice(' + i + ',1);renderSocials();markUnsaved()">×</button>';
+          list.appendChild(row);
+        });
+      }
+
+      function addSocial() {
+        socialsData.push({ name: '', url: '' });
+        renderSocials();
+        markUnsaved();
       }
 
       function showToast(message, type = '') {
@@ -399,7 +579,8 @@
 
       function render() {
         const list = document.getElementById('projectList');
-        document.getElementById('projectCount').textContent = projects.length;
+        document.getElementById('projectCount').textContent = '(' + projects.length + ')';
+        document.getElementById('projectCount2').textContent = projects.length;
 
         const hasChanges = JSON.stringify(projects) !== JSON.stringify(getProjects());
         document.getElementById('statusText').textContent = hasChanges ? 'Unsaved changes' : 'All changes saved';
@@ -559,15 +740,28 @@
       }
 
       function saveAll() {
+        aboutData.bio = document.getElementById('aboutBioInput').value;
+        saveAbout(aboutData);
+        saveContacts(contactsData);
+        saveSocials(socialsData);
         saveProjects(projects);
         render();
         showToast('Changes saved', 'success');
       }
 
       function resetToDefaults() {
-        if (confirm('Reset all projects to default values? This will discard all your edits.')) {
+        if (confirm('Reset everything to default values? This will discard all your edits.')) {
           localStorage.removeItem('bereg_projects');
+          localStorage.removeItem('bereg_about');
+          localStorage.removeItem('bereg_contacts');
+          localStorage.removeItem('bereg_socials');
           projects = [...DEFAULT_PROJECTS.map(p => ({ ...p }))];
+          aboutData = { ...DEFAULT_ABOUT };
+          contactsData = DEFAULT_CONTACTS.map(function(c) { return { ...c }; });
+          socialsData = DEFAULT_SOCIALS.map(function(s) { return { ...s }; });
+          renderAbout();
+          renderContacts();
+          renderSocials();
           render();
           showToast('Reset to defaults', 'success');
         }
@@ -575,6 +769,9 @@
 
       // Init
       loadVideoFiles();
+      renderAbout();
+      renderContacts();
+      renderSocials();
       render();
     </script>
   </body>

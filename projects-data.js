@@ -47,3 +47,54 @@ function getProjects() {
 function saveProjects(projects) {
   localStorage.setItem('bereg_projects', JSON.stringify(projects));
 }
+
+const DEFAULT_ABOUT = {
+  bio: 'Mykyta Bereg is a Ukrainian-born, <em>award-winning editor</em> and <em>art director</em>. Mykyta is represented by Church Edit in the US and lives across Europe.'
+};
+
+const DEFAULT_CONTACTS = [
+  { region: 'US', email: 'elyse@edit.church', phone: '+1.347.429.0831' },
+  { region: 'EU', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' },
+  { region: 'LDN', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' }
+];
+
+const DEFAULT_SOCIALS = [
+  { name: 'Instagram', url: 'http://instagram.com/oveay' },
+  { name: 'Vimeo', url: 'https://vimeo.com/oveay' }
+];
+
+function getAbout() {
+  try {
+    var stored = localStorage.getItem('bereg_about');
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return { ...DEFAULT_ABOUT };
+}
+
+function saveAbout(data) {
+  localStorage.setItem('bereg_about', JSON.stringify(data));
+}
+
+function getContacts() {
+  try {
+    var stored = localStorage.getItem('bereg_contacts');
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return DEFAULT_CONTACTS.map(function(c) { return { ...c }; });
+}
+
+function saveContacts(data) {
+  localStorage.setItem('bereg_contacts', JSON.stringify(data));
+}
+
+function getSocials() {
+  try {
+    var stored = localStorage.getItem('bereg_socials');
+    if (stored) return JSON.parse(stored);
+  } catch (e) {}
+  return DEFAULT_SOCIALS.map(function(s) { return { ...s }; });
+}
+
+function saveSocials(data) {
+  localStorage.setItem('bereg_socials', JSON.stringify(data));
+}

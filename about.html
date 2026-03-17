@@ -29,9 +29,9 @@
       </script>
 
       <!-- About Bio - Centered -->
-      <div class="about-bio">
-        Mykyta Bereg is a Ukrainian-born, <em>award-winning editor</em> and <em>art director</em>. Mykyta is represented by Church Edit in the US and lives across Europe.
-      </div>
+      <div class="about-bio" id="aboutBio"></div>
+      <script src="./projects-data.js"></script>
+      <script>document.getElementById('aboutBio').innerHTML = getAbout().bio;</script>
 
       <!-- Awards Marquee - Bottom -->
       <div class="marquee-container">
