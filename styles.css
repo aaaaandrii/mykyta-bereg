@@ -1037,9 +1037,10 @@ a {
 
 @media (max-width: 768px) {
 
-  /* Logo - hidden on mobile */
   .logo {
-    display: none;
+    position: absolute;
+    left: 5pt;
+    transform: none;
   }
 
   .header {
@@ -1054,17 +1055,16 @@ a {
     margin-left: auto;
   }
 
-  /* All fonts 2x bigger */
   .logo,
   .nav-link,
   .project-name,
   .project-page-title,
   .credit-value {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
   }
 
   .credit-label {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
   }
 
   .project-year,
@@ -1124,12 +1124,12 @@ a {
   }
 
   .contact-region {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
   }
 
   .contact-email,
   .contact-phone {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
   }
 
   .social-links {
@@ -1140,12 +1140,12 @@ a {
   }
 
   .social-link {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
   }
 
   /* Works page */
   .works-item {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
     padding-left: 5pt;
   }
 
@@ -1198,7 +1198,7 @@ a {
   }
 
   .project-nav-arrow {
-    font-size: clamp(18px, 4.4vw, 53px);
+    font-size: clamp(17px, 4.1vw, 52px);
     padding: 40px;
     margin: 0;
     -webkit-tap-highlight-color: transparent;
