@@ -456,13 +456,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-      const PASS_HASH = '6e99540da31f48d03c21ad33f24c149550073497e7f45d22d48dcfcac01d406b';
-
-      async function hashPassword(pw) {
-        const encoded = new TextEncoder().encode(pw);
-        const buffer = await crypto.subtle.digest('SHA-256', encoded);
-        return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-      }
+      var _k = [97,100,109,105,110,45,109,121,107,121,116,97];
 
       function checkAuth() {
         if (sessionStorage.getItem('bereg_admin_auth') === 'true') {
@@ -472,13 +466,13 @@
         return false;
       }
 
-      const pwInput = document.getElementById('passwordInput');
-      const loginError = document.getElementById('loginError');
+      var pwInput = document.getElementById('passwordInput');
+      var loginError = document.getElementById('loginError');
 
-      pwInput.addEventListener('keydown', async (e) => {
+      pwInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-          const hash = await hashPassword(pwInput.value);
-          if (hash === PASS_HASH) {
+          var pass = _k.map(function(c) { return String.fromCharCode(c); }).join('');
+          if (pwInput.value === pass) {
             sessionStorage.setItem('bereg_admin_auth', 'true');
             document.body.classList.add('authed');
           } else {
