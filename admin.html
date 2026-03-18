@@ -99,6 +99,7 @@
         color: #000;
       }
       .btn-primary:hover { background: #ddd; }
+      .btn-primary:disabled { background: #555; color: #999; cursor: not-allowed; }
 
       .btn-secondary {
         background: #222;
@@ -372,11 +373,43 @@
         align-items: center;
       }
       .field-with-upload input { flex: 1; }
-      .upload-name {
-        font-size: 11px;
+
+      .settings-help {
+        font-size: 13px;
         color: #888;
-        margin-top: 4px;
+        margin-bottom: 16px;
+        line-height: 1.6;
       }
+      .settings-help a {
+        color: #88aaff;
+        text-decoration: none;
+      }
+      .settings-help a:hover { text-decoration: underline; }
+
+      .token-row {
+        display: flex;
+        gap: 8px;
+        max-width: 600px;
+      }
+      .token-row input {
+        flex: 1;
+        background: #0a0a0a;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-size: 14px;
+        color: #e0e0e0;
+        font-family: inherit;
+        outline: none;
+      }
+      .token-row input:focus { border-color: #555; }
+      .token-status {
+        font-size: 12px;
+        margin-top: 8px;
+        color: #666;
+      }
+      .token-status.ok { color: #6bff6b; }
+      .token-status.err { color: #ff6b6b; }
 
       .toast {
         position: fixed;
@@ -392,6 +425,7 @@
         transform: translateY(10px);
         transition: all 0.3s ease;
         z-index: 100;
+        max-width: 400px;
       }
       .toast.visible {
         opacity: 1;
@@ -415,11 +449,32 @@
       <div class="header-actions">
         <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
         <button class="btn btn-secondary" onclick="addProject()">+ Add Project</button>
-        <button class="btn btn-primary" onclick="saveAll()">Save Changes</button>
+        <button class="btn btn-primary" id="publishBtn" onclick="publishAll()">Publish</button>
       </div>
     </div>
 
     <div class="admin-content">
+      <!-- Publishing Settings -->
+      <div class="section-header" onclick="toggleSection('settingsSection')">
+        <h2>Publishing Settings</h2>
+        <span class="expand-icon">▾</span>
+      </div>
+      <div class="admin-section" id="settingsSection" style="display:none;">
+        <div class="settings-help">
+          To publish changes visible on all devices, connect your GitHub account.<br>
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=Bereg+Admin" target="_blank" rel="noreferrer">Create a Personal Access Token</a> with <strong>repo</strong> scope, then paste it below.
+        </div>
+        <div class="form-group">
+          <label>GitHub Token</label>
+          <div class="token-row">
+            <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+            <button class="btn btn-secondary btn-small" onclick="saveGhToken()">Save</button>
+            <button class="btn btn-secondary btn-small" onclick="testGhToken()">Test</button>
+          </div>
+          <div class="token-status" id="tokenStatus">Not configured</div>
+        </div>
+      </div>
+
       <!-- About Section -->
       <div class="section-header" onclick="toggleSection('aboutSection')">
         <h2>About Page</h2>
@@ -499,18 +554,12 @@
     </script>
     <script src="./projects-data.js"></script>
     <script>
-      let projects = getProjects();
-      let aboutData = getAbout();
-      let contactsData = getContacts();
-      let socialsData = getSocials();
-      let videoFiles = [];
+      var GH_REPO = 'aaaaandrii/mykyta-bereg';
 
-      async function loadVideoFiles() {
-        const known = DEFAULT_PROJECTS.map(p => p.video);
-        const stored = projects.map(p => p.video);
-        const all = new Set([...known, ...stored]);
-        videoFiles = [...all].sort();
-      }
+      let projects = getProjects().map(function(p) { return Object.assign({}, p); });
+      let aboutData = Object.assign({}, getAbout());
+      let contactsData = getContacts().map(function(c) { return Object.assign({}, c); });
+      let socialsData = getSocials().map(function(s) { return Object.assign({}, s); });
 
       function toggleSection(id) {
         var el = document.getElementById(id);
@@ -527,6 +576,50 @@
       function markUnsaved() {
         document.getElementById('statusText').textContent = 'Unsaved changes';
       }
+
+      // GitHub Token
+      function saveGhToken() {
+        var token = document.getElementById('ghTokenInput').value.trim();
+        if (token) {
+          localStorage.setItem('bereg_gh_token', token);
+          document.getElementById('tokenStatus').textContent = 'Token saved';
+          document.getElementById('tokenStatus').className = 'token-status ok';
+          showToast('Token saved', 'success');
+        }
+      }
+
+      async function testGhToken() {
+        var token = document.getElementById('ghTokenInput').value.trim() || localStorage.getItem('bereg_gh_token');
+        if (!token) {
+          showToast('Enter a token first', 'error');
+          return;
+        }
+        try {
+          var resp = await fetch('https://api.github.com/repos/' + GH_REPO, {
+            headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+          });
+          if (resp.ok) {
+            document.getElementById('tokenStatus').textContent = 'Connected to ' + GH_REPO;
+            document.getElementById('tokenStatus').className = 'token-status ok';
+            showToast('Connection successful', 'success');
+          } else {
+            document.getElementById('tokenStatus').textContent = 'Failed: ' + resp.status;
+            document.getElementById('tokenStatus').className = 'token-status err';
+            showToast('Connection failed: ' + resp.status, 'error');
+          }
+        } catch (e) {
+          showToast('Network error', 'error');
+        }
+      }
+
+      (function() {
+        var saved = localStorage.getItem('bereg_gh_token');
+        if (saved) {
+          document.getElementById('ghTokenInput').value = saved;
+          document.getElementById('tokenStatus').textContent = 'Token configured';
+          document.getElementById('tokenStatus').className = 'token-status ok';
+        }
+      })();
 
       // About
       function renderAbout() {
@@ -576,109 +669,106 @@
         markUnsaved();
       }
 
-      function showToast(message, type = '') {
-        const toast = document.getElementById('toast');
+      function showToast(message, type) {
+        var toast = document.getElementById('toast');
         toast.textContent = message;
-        toast.className = 'toast visible ' + type;
-        setTimeout(() => { toast.className = 'toast'; }, 2500);
+        toast.className = 'toast visible ' + (type || '');
+        setTimeout(function() { toast.className = 'toast'; }, 3000);
       }
 
       function render() {
-        const list = document.getElementById('projectList');
+        var list = document.getElementById('projectList');
         document.getElementById('projectCount').textContent = '(' + projects.length + ')';
         document.getElementById('projectCount2').textContent = projects.length;
 
-        const hasChanges = JSON.stringify(projects) !== JSON.stringify(getProjects());
-        document.getElementById('statusText').textContent = hasChanges ? 'Unsaved changes' : 'All changes saved';
-
         list.innerHTML = '';
-        projects.forEach((p, i) => {
-          const card = document.createElement('div');
+        projects.forEach(function(p, i) {
+          var card = document.createElement('div');
           card.className = 'project-card';
           card.draggable = true;
           card.dataset.index = i;
 
-          card.innerHTML = `
-            <div class="card-header" onclick="toggleCard(this)">
-              <span class="drag-handle" title="Drag to reorder">⠿</span>
-              <span class="card-index">${i + 1}</span>
-              <span class="card-title">${p.name}</span>
-              <span class="card-year">${p.year}</span>
-              <span class="card-video-name">${p.video.split('/').pop()}</span>
-              <span class="expand-icon">▾</span>
-            </div>
-            <div class="card-body">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Project Name</label>
-                  <input type="text" value="${esc(p.name)}" oninput="updateField(${i}, 'name', this.value)" />
-                </div>
-                <div class="form-group">
-                  <label>Year</label>
-                  <input type="text" value="${esc(p.year)}" oninput="updateField(${i}, 'year', this.value)" />
-                </div>
-                <div class="form-group">
-                  <label>Director</label>
-                  <input type="text" value="${esc(p.director)}" oninput="updateField(${i}, 'director', this.value)" />
-                </div>
-                <div class="form-group">
-                  <label>Production</label>
-                  <input type="text" value="${esc(p.production)}" oninput="updateField(${i}, 'production', this.value)" />
-                </div>
-                <div class="form-group full-width">
-                  <label>Description</label>
-                  <input type="text" value="${esc(p.description || '')}" oninput="updateField(${i}, 'description', this.value)" placeholder="Project description" />
-                </div>
-                <div class="form-group full-width">
-                  <label>Preview Video (main page / works page)</label>
-                  <div class="field-with-upload">
-                    <input type="text" value="${esc(p.video)}" oninput="updateField(${i}, 'video', this.value)" placeholder="./videos/filename.mp4" id="videoField_${i}" />
-                    <button class="btn btn-secondary btn-small" onclick="pickVideo(${i}, 'video')">Upload</button>
-                  </div>
-                </div>
-                <div class="form-group full-width">
-                  <label>Full Video URL (project page — leave empty to use preview)</label>
-                  <div class="field-with-upload">
-                    <input type="text" value="${esc(p.videoFull || '')}" oninput="updateField(${i}, 'videoFull', this.value)" placeholder="https://your-r2-bucket.r2.dev/full-video.mp4" id="videoFullField_${i}" />
-                    <button class="btn btn-secondary btn-small" onclick="pickVideo(${i}, 'videoFull')">Upload</button>
-                  </div>
-                </div>
-                <div class="video-preview">
-                  <video src="${esc(p.video)}" muted controls preload="metadata"></video>
-                </div>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-secondary btn-small" onclick="duplicateProject(${i})">Duplicate</button>
-                <button class="btn btn-secondary btn-small" onclick="moveProject(${i}, -1)">↑ Move Up</button>
-                <button class="btn btn-secondary btn-small" onclick="moveProject(${i}, 1)">↓ Move Down</button>
-                <button class="btn btn-danger btn-small" onclick="removeProject(${i})">Delete</button>
-              </div>
-            </div>
-          `;
+          card.innerHTML =
+            '<div class="card-header" onclick="toggleCard(this)">' +
+              '<span class="drag-handle" title="Drag to reorder">⠿</span>' +
+              '<span class="card-index">' + (i + 1) + '</span>' +
+              '<span class="card-title">' + esc(p.name) + '</span>' +
+              '<span class="card-year">' + esc(p.year) + '</span>' +
+              '<span class="card-video-name">' + esc(p.video.split('/').pop()) + '</span>' +
+              '<span class="expand-icon">▾</span>' +
+            '</div>' +
+            '<div class="card-body">' +
+              '<div class="form-grid">' +
+                '<div class="form-group">' +
+                  '<label>Project Name</label>' +
+                  '<input type="text" value="' + esc(p.name) + '" oninput="updateField(' + i + ', \'name\', this.value)" />' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label>Year</label>' +
+                  '<input type="text" value="' + esc(p.year) + '" oninput="updateField(' + i + ', \'year\', this.value)" />' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label>Director</label>' +
+                  '<input type="text" value="' + esc(p.director) + '" oninput="updateField(' + i + ', \'director\', this.value)" />' +
+                '</div>' +
+                '<div class="form-group">' +
+                  '<label>Production</label>' +
+                  '<input type="text" value="' + esc(p.production) + '" oninput="updateField(' + i + ', \'production\', this.value)" />' +
+                '</div>' +
+                '<div class="form-group full-width">' +
+                  '<label>Description</label>' +
+                  '<input type="text" value="' + esc(p.description || '') + '" oninput="updateField(' + i + ', \'description\', this.value)" placeholder="Project description" />' +
+                '</div>' +
+                '<div class="form-group full-width">' +
+                  '<label>Preview Video (main page / works page)</label>' +
+                  '<div class="field-with-upload">' +
+                    '<input type="text" value="' + esc(p.video) + '" oninput="updateField(' + i + ', \'video\', this.value)" placeholder="./videos/filename.mp4" id="videoField_' + i + '" />' +
+                    '<button class="btn btn-secondary btn-small" onclick="pickVideo(' + i + ', \'video\')">Upload</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="form-group full-width">' +
+                  '<label>Full Video URL (project page — leave empty to use preview)</label>' +
+                  '<div class="field-with-upload">' +
+                    '<input type="text" value="' + esc(p.videoFull || '') + '" oninput="updateField(' + i + ', \'videoFull\', this.value)" placeholder="https://your-r2-bucket.r2.dev/full-video.mp4" id="videoFullField_' + i + '" />' +
+                    '<button class="btn btn-secondary btn-small" onclick="pickVideo(' + i + ', \'videoFull\')">Upload</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="video-preview">' +
+                  '<video src="' + esc(p.video) + '" muted controls preload="metadata"></video>' +
+                '</div>' +
+              '</div>' +
+              '<div class="card-actions">' +
+                '<button class="btn btn-secondary btn-small" onclick="duplicateProject(' + i + ')">Duplicate</button>' +
+                '<button class="btn btn-secondary btn-small" onclick="moveProject(' + i + ', -1)">↑ Move Up</button>' +
+                '<button class="btn btn-secondary btn-small" onclick="moveProject(' + i + ', 1)">↓ Move Down</button>' +
+                '<button class="btn btn-danger btn-small" onclick="removeProject(' + i + ')">Delete</button>' +
+              '</div>' +
+            '</div>';
 
-          // Drag events
-          card.addEventListener('dragstart', (e) => {
+          card.addEventListener('dragstart', function(e) {
             card.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', i);
+            e.dataTransfer.setData('text/plain', String(i));
           });
-          card.addEventListener('dragend', () => {
+          card.addEventListener('dragend', function() {
             card.classList.remove('dragging');
           });
-          card.addEventListener('dragover', (e) => {
+          card.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
           });
-          card.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-            const toIndex = i;
-            if (fromIndex !== toIndex) {
-              const item = projects.splice(fromIndex, 1)[0];
-              projects.splice(toIndex, 0, item);
-              render();
-            }
-          });
+          (function(toIndex) {
+            card.addEventListener('drop', function(e) {
+              e.preventDefault();
+              var fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+              if (fromIndex !== toIndex) {
+                var item = projects.splice(fromIndex, 1)[0];
+                projects.splice(toIndex, 0, item);
+                render();
+                markUnsaved();
+              }
+            });
+          })(i);
 
           list.appendChild(card);
         });
@@ -724,7 +814,7 @@
       });
 
       function esc(str) {
-        return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
 
       function toggleCard(header) {
@@ -733,15 +823,14 @@
 
       function updateField(index, field, value) {
         projects[index][field] = value;
-        // Live update header text
-        const card = document.querySelectorAll('.project-card')[index];
+        var card = document.querySelectorAll('.project-card')[index];
         if (field === 'name') card.querySelector('.card-title').textContent = value;
         if (field === 'year') card.querySelector('.card-year').textContent = value;
         if (field === 'video') {
           card.querySelector('.card-video-name').textContent = value.split('/').pop();
           card.querySelector('.video-preview video').src = value;
         }
-        document.getElementById('statusText').textContent = 'Unsaved changes';
+        markUnsaved();
       }
 
       function addProject() {
@@ -755,10 +844,10 @@
           description: ''
         });
         render();
-        // Open the new card
-        const cards = document.querySelectorAll('.project-card');
+        var cards = document.querySelectorAll('.project-card');
         cards[cards.length - 1].classList.add('open');
         cards[cards.length - 1].scrollIntoView({ behavior: 'smooth' });
+        markUnsaved();
       }
 
       function removeProject(index) {
@@ -766,64 +855,139 @@
           showToast('Cannot delete the last project', 'error');
           return;
         }
-        const name = projects[index].name;
-        if (confirm(`Delete "${name}"?`)) {
+        var name = projects[index].name;
+        if (confirm('Delete "' + name + '"?')) {
           projects.splice(index, 1);
           render();
-          showToast(`"${name}" deleted`);
+          markUnsaved();
+          showToast('"' + name + '" deleted');
         }
       }
 
       function duplicateProject(index) {
-        const copy = { ...projects[index] };
+        var copy = Object.assign({}, projects[index]);
         copy.name += ' (Copy)';
         projects.splice(index + 1, 0, copy);
         render();
+        markUnsaved();
         showToast('Project duplicated');
       }
 
       function moveProject(index, direction) {
-        const newIndex = index + direction;
+        var newIndex = index + direction;
         if (newIndex < 0 || newIndex >= projects.length) return;
-        const item = projects.splice(index, 1)[0];
+        var item = projects.splice(index, 1)[0];
         projects.splice(newIndex, 0, item);
         render();
+        markUnsaved();
       }
 
-      function saveAll() {
+      function utf8ToBase64(str) {
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(_, p1) {
+          return String.fromCharCode(parseInt(p1, 16));
+        }));
+      }
+
+      async function publishAll() {
         aboutData.bio = document.getElementById('aboutBioInput').value;
-        saveAbout(aboutData);
-        saveContacts(contactsData);
-        saveSocials(socialsData);
-        saveProjects(projects);
-        render();
-        showToast('Changes saved', 'success');
-      }
 
-      function resetToDefaults() {
-        if (confirm('Reset everything to default values? This will discard all your edits.')) {
-          localStorage.removeItem('bereg_projects');
-          localStorage.removeItem('bereg_about');
-          localStorage.removeItem('bereg_contacts');
-          localStorage.removeItem('bereg_socials');
-          projects = [...DEFAULT_PROJECTS.map(p => ({ ...p }))];
-          aboutData = { ...DEFAULT_ABOUT };
-          contactsData = DEFAULT_CONTACTS.map(function(c) { return { ...c }; });
-          socialsData = DEFAULT_SOCIALS.map(function(s) { return { ...s }; });
-          renderAbout();
-          renderContacts();
-          renderSocials();
-          render();
-          showToast('Reset to defaults', 'success');
+        var token = localStorage.getItem('bereg_gh_token');
+        if (!token) {
+          showToast('Add your GitHub token in Publishing Settings first', 'error');
+          document.getElementById('settingsSection').style.display = '';
+          document.getElementById('settingsSection').previousElementSibling.querySelector('.expand-icon').style.transform = 'rotate(180deg)';
+          return;
+        }
+
+        var data = {
+          projects: projects,
+          about: aboutData,
+          contacts: contactsData,
+          socials: socialsData
+        };
+
+        var content = JSON.stringify(data, null, 2);
+        var encoded = utf8ToBase64(content);
+
+        var btn = document.getElementById('publishBtn');
+        btn.disabled = true;
+        btn.textContent = 'Publishing...';
+
+        try {
+          var sha = null;
+          var getResp = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/data.json', {
+            headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+          });
+          if (getResp.ok) {
+            var fileInfo = await getResp.json();
+            sha = fileInfo.sha;
+          }
+
+          var body = {
+            message: 'Update site data',
+            content: encoded
+          };
+          if (sha) body.sha = sha;
+
+          var putResp = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/data.json', {
+            method: 'PUT',
+            headers: {
+              'Authorization': 'token ' + token,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify(body)
+          });
+
+          if (putResp.ok) {
+            showToast('Published! Changes will be live in ~1 minute.', 'success');
+            document.getElementById('statusText').textContent = 'All changes published';
+          } else {
+            var err = await putResp.json();
+            if (putResp.status === 401) {
+              showToast('Invalid GitHub token — update it in Settings', 'error');
+            } else if (putResp.status === 409) {
+              showToast('Conflict: data was modified elsewhere. Reload and try again.', 'error');
+            } else {
+              showToast('Publish failed: ' + (err.message || putResp.status), 'error');
+            }
+          }
+        } catch (e) {
+          showToast('Network error: ' + e.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Publish';
         }
       }
 
+      async function resetToDefaults() {
+        if (!confirm('Reset everything to default values? This will publish the defaults immediately.')) return;
+        projects = DEFAULT_PROJECTS.map(function(p) { return Object.assign({}, p); });
+        aboutData = Object.assign({}, DEFAULT_ABOUT);
+        contactsData = DEFAULT_CONTACTS.map(function(c) { return Object.assign({}, c); });
+        socialsData = DEFAULT_SOCIALS.map(function(s) { return Object.assign({}, s); });
+        renderAbout();
+        renderContacts();
+        renderSocials();
+        render();
+        await publishAll();
+      }
+
+      // Warn on unsaved changes
+      window.addEventListener('beforeunload', function(e) {
+        var status = document.getElementById('statusText').textContent;
+        if (status === 'Unsaved changes') {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+
       // Init
-      loadVideoFiles();
       renderAbout();
       renderContacts();
       renderSocials();
       render();
+      document.getElementById('statusText').textContent = 'All changes published';
     </script>
   </body>
 </html>

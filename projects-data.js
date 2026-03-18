@@ -1,3 +1,15 @@
+var __remoteData = null;
+(function() {
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', './data.json', false);
+    xhr.send();
+    if (xhr.status === 200) {
+      __remoteData = JSON.parse(xhr.responseText);
+    }
+  } catch (e) {}
+})();
+
 const DEFAULT_PROJECTS = [
   { name: 'Doja Cat', year: '2025', video: './videos/01_DOJA CAT.mp4', videoFull: 'https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/01_DOJA%20CAT.mp4', director: 'Christian Breslauer', production: 'London Alley', description: 'Don Toliver – Lose My Mind (feat. Doja Cat)' },
   { name: 'UFC', year: '2025', video: './videos/02_UFC.mp4', videoFull: 'https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/02_UFC.mp4', director: 'Shapxo', production: 'Shelter, Radioaktivefilm', description: 'UFC – This One Hits Different' },
@@ -23,31 +35,6 @@ const DEFAULT_PROJECTS = [
   { name: 'Lisa', year: '2025', video: './videos/22_LISA.mp4', videoFull: 'https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/23_LISA.mp4', director: 'Christian Breslauer', production: 'London Alley', description: 'LISA – FUTW' }
 ];
 
-function getProjects() {
-  try {
-    const stored = localStorage.getItem('bereg_projects');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed.map((p, i) => {
-        const def = DEFAULT_PROJECTS[i] || {};
-        return {
-          ...def,
-          ...p,
-          description: p.description || def.description || '',
-          videoFull: p.videoFull || def.videoFull || '',
-          director: p.director === 'Director Name' ? (def.director || p.director) : p.director,
-          production: p.production === 'Production Name' ? (def.production || p.production) : p.production
-        };
-      });
-    }
-  } catch (e) {}
-  return DEFAULT_PROJECTS;
-}
-
-function saveProjects(projects) {
-  localStorage.setItem('bereg_projects', JSON.stringify(projects));
-}
-
 const DEFAULT_ABOUT = {
   bio: 'Mykyta Bereg is a Ukrainian-born, <em>award-winning editor</em> and <em>art director</em>. Mykyta is represented by Church Edit in the US and lives across Europe.'
 };
@@ -63,38 +50,38 @@ const DEFAULT_SOCIALS = [
   { name: 'Vimeo', url: 'https://vimeo.com/oveay' }
 ];
 
+function getProjects() {
+  if (__remoteData && __remoteData.projects && __remoteData.projects.length) {
+    return __remoteData.projects;
+  }
+  return DEFAULT_PROJECTS;
+}
+
+function saveProjects() {}
+
 function getAbout() {
-  try {
-    var stored = localStorage.getItem('bereg_about');
-    if (stored) return JSON.parse(stored);
-  } catch (e) {}
+  if (__remoteData && __remoteData.about) {
+    return __remoteData.about;
+  }
   return { ...DEFAULT_ABOUT };
 }
 
-function saveAbout(data) {
-  localStorage.setItem('bereg_about', JSON.stringify(data));
-}
+function saveAbout() {}
 
 function getContacts() {
-  try {
-    var stored = localStorage.getItem('bereg_contacts');
-    if (stored) return JSON.parse(stored);
-  } catch (e) {}
+  if (__remoteData && __remoteData.contacts) {
+    return __remoteData.contacts;
+  }
   return DEFAULT_CONTACTS.map(function(c) { return { ...c }; });
 }
 
-function saveContacts(data) {
-  localStorage.setItem('bereg_contacts', JSON.stringify(data));
-}
+function saveContacts() {}
 
 function getSocials() {
-  try {
-    var stored = localStorage.getItem('bereg_socials');
-    if (stored) return JSON.parse(stored);
-  } catch (e) {}
+  if (__remoteData && __remoteData.socials) {
+    return __remoteData.socials;
+  }
   return DEFAULT_SOCIALS.map(function(s) { return { ...s }; });
 }
 
-function saveSocials(data) {
-  localStorage.setItem('bereg_socials', JSON.stringify(data));
-}
+function saveSocials() {}
