@@ -34,11 +34,11 @@
 
     <!-- Header -->
     <header class="header" id="header">
-      <span onclick="navigateTo('index.html')" class="logo">Mykyta Bereg</span>
+      <span onclick="navigateTo('./')" class="logo">Mykyta Bereg</span>
       <div class="header-nav">
-        <span onclick="navigateTo('works.html')" class="nav-link">Works</span>
-        <span onclick="navigateTo('about.html')" class="nav-link">About</span>
-        <span onclick="navigateTo('contact.html')" class="nav-link">Contact</span>
+        <span onclick="navigateTo('./works')" class="nav-link">Works</span>
+        <span onclick="navigateTo('./about')" class="nav-link">About</span>
+        <span onclick="navigateTo('./contact')" class="nav-link">Contact</span>
       </div>
     </header>
 
@@ -128,18 +128,18 @@
 
         document.getElementById('navPrev').onclick = function(e) {
           e.stopPropagation();
-          window.location.href = 'project.html?id=' + prevId;
+          window.location.href = './project?id=' + prevId;
         };
         document.getElementById('navNext').onclick = function(e) {
           e.stopPropagation();
-          window.location.href = 'project.html?id=' + nextId;
+          window.location.href = './project?id=' + nextId;
         };
 
         document.addEventListener('keydown', function(e) {
           if (e.key === 'ArrowLeft') {
-            window.location.href = 'project.html?id=' + prevId;
+            window.location.href = './project?id=' + prevId;
           } else if (e.key === 'ArrowRight') {
-            window.location.href = 'project.html?id=' + nextId;
+            window.location.href = './project?id=' + nextId;
           }
         });
 

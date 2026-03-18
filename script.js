@@ -78,7 +78,7 @@ if (isMobile()) {
 
       var p = projects[index];
       updateProjectName(p.name, p.year);
-      if (projectLink) projectLink.dataset.url = 'project.html?id=' + index;
+      if (projectLink) projectLink.dataset.url = './project?id=' + index;
 
       if (firstLoad) {
         firstLoad = false;
@@ -284,7 +284,7 @@ if (isMobile()) {
           video.play().catch(function() {});
           var p = projects[index];
           updateProjectName(p.name, p.year);
-          if (projectLink) projectLink.dataset.url = 'project.html?id=' + index;
+          if (projectLink) projectLink.dataset.url = './project?id=' + index;
         }
         currentVideoIndex = index;
       }
