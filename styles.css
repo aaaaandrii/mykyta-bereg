@@ -558,6 +558,7 @@ a {
   align-items: center;
   text-align: center;
   width: 200px;
+  opacity: 0;
 }
 
 .contact-region {

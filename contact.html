@@ -77,21 +77,18 @@
       (function() {
         var columns = document.querySelectorAll('.contact-column');
         columns.forEach(function(col) {
-          col.style.opacity = '0';
           col.addEventListener('mouseenter', function() {
             col.classList.add('revealed');
           });
         });
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            columns.forEach(function(col, i) {
+        setTimeout(function() {
+          columns.forEach(function(col, i) {
+            setTimeout(function() {
               col.style.transition = 'opacity 1s ease';
-              setTimeout(function() {
-                col.style.opacity = '1';
-              }, i * 500);
-            });
+              col.style.opacity = '1';
+            }, i * 500);
           });
-        });
+        }, 50);
       })();
     </script>
   </body>
