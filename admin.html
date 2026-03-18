@@ -366,6 +366,18 @@
       }
       .row-delete:hover { color: #ff6b6b; }
 
+      .field-with-upload {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .field-with-upload input { flex: 1; }
+      .upload-name {
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+      }
+
       .toast {
         position: fixed;
         bottom: 24px;
@@ -619,11 +631,17 @@
                 </div>
                 <div class="form-group full-width">
                   <label>Preview Video (main page / works page)</label>
-                  <input type="text" value="${esc(p.video)}" oninput="updateField(${i}, 'video', this.value)" placeholder="./videos/filename.mp4" />
+                  <div class="field-with-upload">
+                    <input type="text" value="${esc(p.video)}" oninput="updateField(${i}, 'video', this.value)" placeholder="./videos/filename.mp4" id="videoField_${i}" />
+                    <button class="btn btn-secondary btn-small" onclick="pickVideo(${i}, 'video')">Upload</button>
+                  </div>
                 </div>
                 <div class="form-group full-width">
                   <label>Full Video URL (project page — leave empty to use preview)</label>
-                  <input type="text" value="${esc(p.videoFull || '')}" oninput="updateField(${i}, 'videoFull', this.value)" placeholder="https://your-r2-bucket.r2.dev/full-video.mp4" />
+                  <div class="field-with-upload">
+                    <input type="text" value="${esc(p.videoFull || '')}" oninput="updateField(${i}, 'videoFull', this.value)" placeholder="https://your-r2-bucket.r2.dev/full-video.mp4" id="videoFullField_${i}" />
+                    <button class="btn btn-secondary btn-small" onclick="pickVideo(${i}, 'videoFull')">Upload</button>
+                  </div>
                 </div>
                 <div class="video-preview">
                   <video src="${esc(p.video)}" muted controls preload="metadata"></video>
@@ -665,6 +683,45 @@
           list.appendChild(card);
         });
       }
+
+      var R2_BASE = 'https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/';
+      var _pickIdx = -1;
+      var _pickField = '';
+
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'video/mp4,video/*';
+      fileInput.style.display = 'none';
+      document.body.appendChild(fileInput);
+
+      function pickVideo(index, field) {
+        _pickIdx = index;
+        _pickField = field;
+        fileInput.value = '';
+        fileInput.click();
+      }
+
+      fileInput.addEventListener('change', function() {
+        if (!fileInput.files || !fileInput.files[0]) return;
+        var file = fileInput.files[0];
+        var encoded = encodeURIComponent(file.name).replace(/%20/g, '%20');
+        var url = R2_BASE + encoded;
+
+        projects[_pickIdx][_pickField] = url;
+        var inputEl = document.getElementById((_pickField === 'videoFull' ? 'videoFullField_' : 'videoField_') + _pickIdx);
+        if (inputEl) inputEl.value = url;
+
+        if (_pickField === 'video') {
+          var card = document.querySelectorAll('.project-card')[_pickIdx];
+          if (card) {
+            card.querySelector('.card-video-name').textContent = file.name;
+            card.querySelector('.video-preview video').src = URL.createObjectURL(file);
+          }
+        }
+
+        markUnsaved();
+        showToast('URL set: ' + file.name + ' — upload this file to R2 manually', 'success');
+      });
 
       function esc(str) {
         return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
