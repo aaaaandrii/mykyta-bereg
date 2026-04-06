@@ -19,13 +19,13 @@
       "description": "UFC – This One Hits Different"
     },
     {
-      "name": "Elife",
+      "name": "Citroen",
       "year": "2025",
-      "video": "./videos/03_ELIFE.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/03_ELIFE.mp4",
+      "video": "./videos/21_CITROEN.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/14_CITROEN.mp4",
       "director": "Shapxo",
-      "production": "BIG KAHUNA FILMS, Side",
-      "description": "eLIFE – AI-Driven"
+      "production": "Quad x Radioaktivefilm",
+      "description": "Citroen C5"
     },
     {
       "name": "Nike",
@@ -46,15 +46,6 @@
       "description": "Parions Sport"
     },
     {
-      "name": "Polestar",
-      "year": "2025",
-      "video": "./videos/06_POLESTAR.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/07_POLESTAR.mp4",
-      "director": "Maksym Getman",
-      "production": "Esse House",
-      "description": "Polestar 2 – \"So Much More\""
-    },
-    {
       "name": "Porsche",
       "year": "2026",
       "video": "./videos/07_PORSCHE.mp4",
@@ -62,15 +53,6 @@
       "director": "Maksym Getman",
       "production": "Esse House & NDA",
       "description": "Porsche 911 GT3 RS – To the One Who Follows"
-    },
-    {
-      "name": "Nike",
-      "year": "2025",
-      "video": "./videos/08_NIKE.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/09_NIKE.mp4",
-      "director": "Shapxo",
-      "production": "Shooteurope",
-      "description": "Nike Football – Rodri"
     },
     {
       "name": "Yamaha",
@@ -109,13 +91,22 @@
       "description": "Twenty One Pilots – Paladin Strait"
     },
     {
-      "name": "Madonna",
-      "year": "2023",
-      "video": "./videos/13_MADONNA.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/13_MADONNA.mp4",
-      "director": "Sasha Kasiuha",
-      "production": "SKNX",
-      "description": "Madonna – Hung Up ft. Tokischa"
+      "name": "Megan Thee Stallion",
+      "year": "2025",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/26_CHICAS_MTS_GIF_FIX.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/26_CHICAS_MTS.mp4",
+      "director": "Sara Lacombe",
+      "production": "Chicas Divertidas Tequila",
+      "description": "Chicas Divertidas Tequila Feat. Megan Thee Stallion"
+    },
+    {
+      "name": "Nike",
+      "year": "2025",
+      "video": "./videos/08_NIKE.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/09_NIKE.mp4",
+      "director": "Shapxo",
+      "production": "Shooteurope",
+      "description": "Nike Football – Rodri"
     },
     {
       "name": "Peggy Gou",
@@ -181,13 +172,13 @@
       "description": "Tyla Yaweh – City of Dreams ft. Chris Brown"
     },
     {
-      "name": "Citroen",
+      "name": "Elife",
       "year": "2025",
-      "video": "./videos/21_CITROEN.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/14_CITROEN.mp4",
+      "video": "./videos/03_ELIFE.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/03_ELIFE.mp4",
       "director": "Shapxo",
-      "production": "Quad x Radioaktivefilm",
-      "description": "Citroen C5"
+      "production": "BIG KAHUNA FILMS, Side",
+      "description": "eLIFE – AI-Driven"
     },
     {
       "name": "Lisa",
@@ -199,7 +190,7 @@
       "description": "LISA – FUTW"
     },
     {
-      "name": "GOALS",
+      "name": "Goals",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/25_GOALS_GIF.mp4",
       "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/25_GOALS_1.mp4",
@@ -208,13 +199,13 @@
       "description": "GOALS - Official Trailer"
     },
     {
-      "name": "Megan Thee Stallion",
+      "name": "Polestar",
       "year": "2025",
-      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/26_CHICAS_MTS_GIF.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/26_CHICAS_MTS.mp4",
-      "director": "Sara Lacombe",
-      "production": "Chicas Divertidas Tequila",
-      "description": "Chicas Divertidas Tequila Feat. Megan Thee Stallion"
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/07_POLESTAR_GIF.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/07_POLESTAR.mp4",
+      "director": "Maksym Getman",
+      "production": "Esse House",
+      "description": "Polestar 2 – \"So Much More\""
     }
   ],
   "about": {
