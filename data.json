@@ -224,6 +224,33 @@
       "director": "Jeremi Durand",
       "production": "The Midnight Club",
       "description": ""
+    },
+    {
+      "name": "EWC",
+      "year": "2026",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/29_EWC_FOUNDING-PARTNERS-26_HERO_EN_01_PRORES.mp4",
+      "videoFull": "",
+      "director": "Jamie Wandroph",
+      "production": "NMBRS",
+      "description": ""
+    },
+    {
+      "name": "NIKE",
+      "year": "2026",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/31_Mbappe%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV.mp4",
+      "videoFull": "",
+      "director": "Shapxo",
+      "production": "Abyss Digital",
+      "description": ""
+    },
+    {
+      "name": "New Project",
+      "year": "2026",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/30_ViniJr%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV.mp4",
+      "videoFull": "",
+      "director": "Shapxo",
+      "production": "Abyss Digital",
+      "description": ""
     }
   ],
   "about": {
