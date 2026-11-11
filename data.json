@@ -193,7 +193,7 @@
       "name": "NIKE",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/30_ViniJr%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/30_FULL_ViniJr%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV_1.mp4",
       "director": "Shapxo",
       "production": "Abyss Digital",
       "description": ""
@@ -220,7 +220,7 @@
       "name": "F1",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/28_Roberto%20Carlos%20versus%20Sebastian%20Vettel.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/28_Roberto%20Carlos%20versus%20Sebastian%20Vettel.mp4",
       "director": "Lukas Tielke",
       "production": "Peoplegrapher",
       "description": ""
@@ -229,7 +229,7 @@
       "name": "ADIDAS",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/28_F50vsPREDATOR_LOGOS_4-3.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/28_FULL_MASTER_F50vsPREDATOR_LOGOS_4-3.mp4",
       "director": "Jeremi Durand",
       "production": "The Midnight Club",
       "description": ""
@@ -238,7 +238,7 @@
       "name": "EWC",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/29_EWC_FOUNDING-PARTNERS-26_HERO_EN_01_PRORES.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/29_full_EWC_FOUNDING-PARTNERS-26_HERO_EN_01_PRORES.mp4",
       "director": "Jamie Wandroph",
       "production": "NMBRS",
       "description": ""
@@ -247,7 +247,7 @@
       "name": "NIKE",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/31_Mbappe%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/31_full_Mbappe%20-%20RG11K6-P01_FA26_Mercurial_AthleteAV_1.mp4",
       "director": "Shapxo",
       "production": "Abyss Digital",
       "description": ""
@@ -256,9 +256,27 @@
       "name": "Lamborghini",
       "year": "2026",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/32_Lamborghini%20Revuelto%20SV.%20The%20Quantum%20of%20Driving_Director's%20cut.mp4",
-      "videoFull": "",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/Lamborghini%20Revuelto%20SV.%20The%20Quantum%20of%20Driving_Director's%20cut.mp4",
       "director": "Maksym Getman",
       "production": "Think Cattleya",
+      "description": ""
+    },
+    {
+      "name": "KATY PERRY",
+      "year": "2026",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/33_KATY_WIB_FINAL_FFA_0615_2.mp4",
+      "videoFull": "",
+      "director": "Christian Breslauer",
+      "production": "London Alley",
+      "description": ""
+    },
+    {
+      "name": "SHAKIRA",
+      "year": "2026",
+      "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/Shakira_Maluma_DC_1008.mp4",
+      "videoFull": "",
+      "director": "Hannah Lux Davis",
+      "production": "London Alley",
       "description": ""
     }
   ],
