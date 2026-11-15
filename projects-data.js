@@ -40,9 +40,9 @@ const DEFAULT_ABOUT = {
 };
 
 const DEFAULT_CONTACTS = [
-  { region: 'US', email: 'elyse@edit.church', phone: '+1.347.429.0831' },
-  { region: 'EU', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' },
-  { region: 'LDN', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' }
+  { region: 'US', people: [{ label: '', email: 'elyse@edit.church', phone: '+1.347.429.0831' }] },
+  { region: 'EU', people: [{ label: '', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' }] },
+  { region: 'LDN', people: [{ label: '', email: 'oveay.coop@gmail.com', phone: '+48.571.931.569' }] }
 ];
 
 const DEFAULT_SOCIALS = [
@@ -68,11 +68,20 @@ function getAbout() {
 
 function saveAbout() {}
 
+// Each region holds several people; older data stored one email/phone per region
+function normalizeContact(c) {
+  var people = c.people || [{ label: '', email: c.email, phone: c.phone }];
+  return {
+    region: c.region || '',
+    people: people.map(function(p) {
+      return { label: p.label || '', email: p.email || '', phone: p.phone || '' };
+    })
+  };
+}
+
 function getContacts() {
-  if (__remoteData && __remoteData.contacts) {
-    return __remoteData.contacts;
-  }
-  return DEFAULT_CONTACTS.map(function(c) { return { ...c }; });
+  var list = (__remoteData && __remoteData.contacts) || DEFAULT_CONTACTS;
+  return list.map(normalizeContact);
 }
 
 function saveContacts() {}

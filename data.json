@@ -286,18 +286,38 @@
   "contacts": [
     {
       "region": "US",
-      "email": "elyse@edit.church",
-      "phone": "freya@edit.church"
+      "people": [
+        {
+          "label": "",
+          "email": "elyse@edit.church",
+          "phone": ""
+        },
+        {
+          "label": "",
+          "email": "freya@edit.church",
+          "phone": ""
+        }
+      ]
     },
     {
       "region": "EU",
-      "email": "oveay.coop@gmail.com",
-      "phone": "+48.571.931.569"
+      "people": [
+        {
+          "label": "",
+          "email": "oveay.coop@gmail.com",
+          "phone": "+48.571.931.569"
+        }
+      ]
     },
     {
       "region": "UK",
-      "email": "oveay.coop@gmail.com",
-      "phone": "+48.571.931.569"
+      "people": [
+        {
+          "label": "",
+          "email": "oveay.coop@gmail.com",
+          "phone": "+48.571.931.569"
+        }
+      ]
     }
   ],
   "socials": [

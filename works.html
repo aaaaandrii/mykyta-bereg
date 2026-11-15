@@ -171,10 +171,6 @@
 
       let currentIndex = startIndex;
 
-      let velocity = 0;
-      let lastScrollTime = 0;
-      let inertiaFrame = null;
-
       function centerActiveItem(index) {
         const activeItem = worksItems[index];
         const viewportCenter = window.innerHeight / 2;
@@ -291,53 +287,38 @@
         window.location.href = `./project?id=${videoIndex}`;
       });
 
-      const scrollThreshold = 168;
-      let scrollAccumulator = 0;
-
-      function processInertia() {
-        if (Math.abs(velocity) > 0.5) {
-          velocity *= 0.85;
-          scrollAccumulator += velocity;
-
-          if (Math.abs(scrollAccumulator) >= scrollThreshold) {
-            if (scrollAccumulator > 0) {
-              setActiveItem(currentIndex + 1);
-            } else {
-              setActiveItem(currentIndex - 1);
-            }
-            scrollAccumulator = 0;
-          }
-
-          inertiaFrame = requestAnimationFrame(processInertia);
-        } else {
-          velocity = 0;
-          scrollAccumulator = 0;
-        }
-      }
+      // Wheel: the first tick of a gesture moves one item right away; continued
+      // scrolling (fast wheel spins, trackpad swipes) moves one item per wheelStep
+      const wheelStep = 100;
+      const wheelGestureGap = 200;
+      let wheelAccumulator = 0;
+      let wheelDir = 0;
+      let lastWheelTime = 0;
 
       window.addEventListener('wheel', (e) => {
         e.preventDefault();
+        let dy = e.deltaY;
+        if (e.deltaMode === 1) dy *= 16;
+        else if (e.deltaMode === 2) dy *= window.innerHeight;
+        if (!dy) return;
+
         const now = Date.now();
-        lastScrollTime = now;
-        velocity += e.deltaY * 0.3;
-        velocity = Math.max(-50, Math.min(50, velocity));
+        const newGesture = now - lastWheelTime > wheelGestureGap;
+        lastWheelTime = now;
 
-        if (inertiaFrame) {
-          cancelAnimationFrame(inertiaFrame);
+        const dir = dy > 0 ? 1 : -1;
+        if (newGesture || dir !== wheelDir) {
+          wheelDir = dir;
+          wheelAccumulator = 0;
+          setActiveItem(currentIndex + dir);
+          return;
         }
 
-        scrollAccumulator += e.deltaY;
-
-        if (Math.abs(scrollAccumulator) >= scrollThreshold) {
-          if (scrollAccumulator > 0) {
-            setActiveItem(currentIndex + 1);
-          } else {
-            setActiveItem(currentIndex - 1);
-          }
-          scrollAccumulator = 0;
+        wheelAccumulator += Math.abs(dy);
+        if (wheelAccumulator >= wheelStep) {
+          wheelAccumulator -= wheelStep;
+          setActiveItem(currentIndex + dir);
         }
-
-        inertiaFrame = requestAnimationFrame(processInertia);
       }, { passive: false });
 
       let touchStartY = 0;
@@ -345,10 +326,6 @@
 
       window.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
-        if (inertiaFrame) {
-          cancelAnimationFrame(inertiaFrame);
-          velocity = 0;
-        }
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {

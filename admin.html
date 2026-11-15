@@ -355,6 +355,10 @@
       }
       .contact-row input:focus, .social-row input:focus { border-color: #555; }
       .contact-row input:first-child { max-width: 80px; }
+      .contact-group { margin-bottom: 18px; }
+      .contact-group .btn-small { flex: none; }
+      .contact-person-row { padding-left: 24px; }
+      .contact-person-row input:first-child { max-width: 160px; }
       .social-row input:first-child { max-width: 140px; }
       .row-delete {
         background: none;
@@ -558,7 +562,7 @@
 
       let projects = getProjects().map(function(p) { return Object.assign({}, p); });
       let aboutData = Object.assign({}, getAbout());
-      let contactsData = getContacts().map(function(c) { return Object.assign({}, c); });
+      let contactsData = getContacts();
       let socialsData = getSocials().map(function(s) { return Object.assign({}, s); });
 
       function toggleSection(id) {
@@ -631,19 +635,37 @@
         var list = document.getElementById('contactList');
         list.innerHTML = '';
         contactsData.forEach(function(c, i) {
-          var row = document.createElement('div');
-          row.className = 'contact-row';
-          row.innerHTML =
+          var group = document.createElement('div');
+          group.className = 'contact-group';
+          var html =
+            '<div class="contact-row">' +
             '<input type="text" value="' + esc(c.region) + '" placeholder="Region" oninput="contactsData[' + i + '].region=this.value;markUnsaved()">' +
-            '<input type="text" value="' + esc(c.email) + '" placeholder="Email" oninput="contactsData[' + i + '].email=this.value;markUnsaved()">' +
-            '<input type="text" value="' + esc(c.phone) + '" placeholder="Phone" oninput="contactsData[' + i + '].phone=this.value;markUnsaved()">' +
-            '<button class="row-delete" onclick="contactsData.splice(' + i + ',1);renderContacts();markUnsaved()">×</button>';
-          list.appendChild(row);
+            '<button class="btn btn-secondary btn-small" onclick="addPerson(' + i + ')">+ Contact</button>' +
+            '<button class="row-delete" title="Delete region" onclick="contactsData.splice(' + i + ',1);renderContacts();markUnsaved()">×</button>' +
+            '</div>';
+          c.people.forEach(function(p, j) {
+            var ref = 'contactsData[' + i + '].people[' + j + ']';
+            html +=
+              '<div class="contact-row contact-person-row">' +
+              '<input type="text" value="' + esc(p.label) + '" placeholder="Label (optional)" oninput="' + ref + '.label=this.value;markUnsaved()">' +
+              '<input type="text" value="' + esc(p.email) + '" placeholder="Email" oninput="' + ref + '.email=this.value;markUnsaved()">' +
+              '<input type="text" value="' + esc(p.phone) + '" placeholder="Phone" oninput="' + ref + '.phone=this.value;markUnsaved()">' +
+              '<button class="row-delete" title="Delete contact" onclick="contactsData[' + i + '].people.splice(' + j + ',1);renderContacts();markUnsaved()">×</button>' +
+              '</div>';
+          });
+          group.innerHTML = html;
+          list.appendChild(group);
         });
       }
 
       function addContact() {
-        contactsData.push({ region: '', email: '', phone: '' });
+        contactsData.push({ region: '', people: [{ label: '', email: '', phone: '' }] });
+        renderContacts();
+        markUnsaved();
+      }
+
+      function addPerson(i) {
+        contactsData[i].people.push({ label: '', email: '', phone: '' });
         renderContacts();
         markUnsaved();
       }
@@ -964,7 +986,7 @@
         if (!confirm('Reset everything to default values? This will publish the defaults immediately.')) return;
         projects = DEFAULT_PROJECTS.map(function(p) { return Object.assign({}, p); });
         aboutData = Object.assign({}, DEFAULT_ABOUT);
-        contactsData = DEFAULT_CONTACTS.map(function(c) { return Object.assign({}, c); });
+        contactsData = DEFAULT_CONTACTS.map(normalizeContact);
         socialsData = DEFAULT_SOCIALS.map(function(s) { return Object.assign({}, s); });
         renderAbout();
         renderContacts();

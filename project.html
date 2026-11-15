@@ -27,7 +27,7 @@
 
     <!-- Fullscreen background video -->
     <div class="project-video-bg" id="videoBg">
-      <video id="projectVideo" class="project-video-fullscreen" playsinline muted loop>
+      <video id="projectVideo" class="project-video-fullscreen" playsinline loop>
         <source src="" type="video/mp4">
       </video>
     </div>
@@ -52,10 +52,13 @@
     <div class="project-nav-arrow project-nav-prev" id="navPrev">←</div>
     <div class="project-nav-arrow project-nav-next" id="navNext">→</div>
 
-    <!-- Center info overlay (fades out after 2s) -->
+    <!-- Center info overlay: title card with play button, or fades out after 2s when autoplaying -->
     <div class="project-center-info" id="centerInfo">
       <h2 class="center-info-title" id="centerInfoTitle"></h2>
       <p class="center-info-desc" id="centerInfoDesc"></p>
+      <button class="center-play-btn" id="centerPlayBtn" title="Play" style="display:none;">
+        <svg width="22" height="22" viewBox="0 0 14 14" fill="white"><path d="M2 0L13 7L2 14V0Z"/></svg>
+      </button>
     </div>
 
     <!-- Bottom bar: credits + player controls -->
@@ -126,20 +129,41 @@
         var prevId = (projectId - 1 + projects.length) % projects.length;
         var nextId = (projectId + 1) % projects.length;
 
+        // Stepping to another project carries playback over, so it autoplays with sound.
+        // The picture, sound and project text fade out first; the next page fades in.
+        var leaving = false;
+        function goToProject(id) {
+          if (leaving) return;
+          leaving = true;
+          try { sessionStorage.setItem('bereg_autoplay', '1'); } catch (e) {}
+          document.body.classList.add('project-leaving');
+          var video = document.getElementById('projectVideo');
+          var startVol = video.volume;
+          var start = Date.now();
+          var fadeAudio = setInterval(function() {
+            var k = Math.min((Date.now() - start) / 500, 1);
+            video.volume = startVol * (1 - k);
+            if (k === 1) clearInterval(fadeAudio);
+          }, 25);
+          setTimeout(function() {
+            window.location.href = './project?id=' + id;
+          }, 500);
+        }
+
         document.getElementById('navPrev').onclick = function(e) {
           e.stopPropagation();
-          window.location.href = './project?id=' + prevId;
+          goToProject(prevId);
         };
         document.getElementById('navNext').onclick = function(e) {
           e.stopPropagation();
-          window.location.href = './project?id=' + nextId;
+          goToProject(nextId);
         };
 
         document.addEventListener('keydown', function(e) {
           if (e.key === 'ArrowLeft') {
-            window.location.href = './project?id=' + prevId;
+            goToProject(prevId);
           } else if (e.key === 'ArrowRight') {
-            window.location.href = './project?id=' + nextId;
+            goToProject(nextId);
           }
         });
 
@@ -171,18 +195,51 @@
         var centerInfo = document.getElementById('centerInfo');
 
         video.load();
-        video.muted = true;
         video.volume = 1;
 
-        // Autoplay muted
-        video.addEventListener('loadeddata', function() {
+        // Fade the picture in once there's a frame to show
+        function revealVideo() { video.classList.add('ready'); }
+        video.addEventListener('loadeddata', revealVideo, { once: true });
+        setTimeout(revealVideo, 2500);
+
+        // Opened from the works list: wait on a title card with a play button, so
+        // playback starts on a click and always has sound. Opened via next/prev:
+        // autoplay with sound, falling back to the title card where the browser
+        // blocks audible autoplay (Safari, iOS).
+        var autoplay = false;
+        try {
+          autoplay = sessionStorage.getItem('bereg_autoplay') === '1';
+          sessionStorage.removeItem('bereg_autoplay');
+          video.muted = sessionStorage.getItem('bereg_muted') === '1';
+        } catch (e) {}
+        var centerPlayBtn = document.getElementById('centerPlayBtn');
+
+        function showTitleCard() {
+          centerPlayBtn.style.display = '';
+          centerInfo.classList.remove('fade-out');
+        }
+
+        centerPlayBtn.onclick = function(e) {
+          e.stopPropagation();
           video.play().catch(function() {});
+        };
+
+        // The button fades out together with the title
+        video.addEventListener('play', function() {
+          centerInfo.classList.add('fade-out');
         });
 
-        // Fade out center info after 1 second
-        setTimeout(function() {
-          centerInfo.classList.add('fade-out');
-        }, 2000);
+        if (autoplay) {
+          video.addEventListener('loadeddata', function() {
+            video.play().catch(showTitleCard);
+          }, { once: true });
+          // Fade out center info after 2 seconds
+          setTimeout(function() {
+            if (!video.paused) centerInfo.classList.add('fade-out');
+          }, 2000);
+        } else {
+          showTitleCard();
+        }
 
         function fmt(s) {
           var m = Math.floor(s / 60);
@@ -222,23 +279,24 @@
         // Play/Pause
         function togglePlay() {
           if (video.paused) {
-            video.play();
-            iconPlay.style.display = 'none';
-            iconPause.style.display = 'block';
+            video.play().catch(function() {});
           } else {
             video.pause();
-            iconPlay.style.display = 'block';
-            iconPause.style.display = 'none';
           }
+        }
+
+        function syncPlayIcon() {
+          iconPlay.style.display = video.paused ? 'block' : 'none';
+          iconPause.style.display = video.paused ? 'none' : 'block';
         }
 
         video.onclick = function(e) { e.stopPropagation(); togglePlay(); };
         playPauseBtn.onclick = function(e) { e.stopPropagation(); togglePlay(); };
 
-        video.addEventListener('ended', function() {
-          iconPlay.style.display = 'block';
-          iconPause.style.display = 'none';
-        });
+        video.addEventListener('play', syncPlayIcon);
+        video.addEventListener('pause', syncPlayIcon);
+        video.addEventListener('ended', syncPlayIcon);
+        syncPlayIcon();
 
         // Volume mute/unmute
         var savedVol = 1;
@@ -258,6 +316,7 @@
             savedVol = video.volume;
             video.muted = true;
           }
+          try { sessionStorage.setItem('bereg_muted', video.muted ? '1' : '0'); } catch (e) {}
           syncVolIcon();
         };
 

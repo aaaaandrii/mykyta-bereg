@@ -52,11 +52,15 @@
           contacts.forEach(function(c) {
             var div = document.createElement('div');
             div.className = 'contact-column';
+            var details = c.people.map(function(p) {
+              return '<div class="contact-person">' +
+                (p.label ? '<span class="contact-person-label">' + p.label + '</span>' : '') +
+                (p.email ? '<a href="mailto:' + p.email + '" class="contact-email">' + p.email + '</a>' : '') +
+                (p.phone ? '<a href="tel:' + p.phone.replace(/[.\s]/g, '') + '" class="contact-phone">' + p.phone + '</a>' : '') +
+                '</div>';
+            }).join('');
             div.innerHTML = '<div class="contact-region">' + c.region + '</div>' +
-              '<div class="contact-details">' +
-              '<a href="mailto:' + c.email + '" class="contact-email">' + c.email + '</a>' +
-              '<a href="tel:' + c.phone.replace(/[.\s]/g, '') + '" class="contact-phone">' + c.phone + '</a>' +
-              '</div>';
+              '<div class="contact-details">' + details + '</div>';
             colsEl.appendChild(div);
           });
           var linksEl = document.getElementById('socialLinks');
@@ -84,11 +88,10 @@
         setTimeout(function() {
           columns.forEach(function(col, i) {
             setTimeout(function() {
-              col.style.transition = 'opacity 1s ease';
-              col.style.opacity = '1';
+              col.classList.add('visible');
             }, i * 500);
           });
-        }, 50);
+        }, 150);
       })();
     </script>
   </body>
