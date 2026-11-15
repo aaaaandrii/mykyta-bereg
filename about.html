@@ -4,16 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Mykyta Bereg is a Ukrainian-born, award-winning editor and art director." />
-    <meta property="og:title" content="About — Mykyta Bereg" />
+    <meta property="og:title" content="About – Mykyta Bereg" />
     <meta property="og:description" content="Mykyta Bereg is a Ukrainian-born, award-winning editor and art director." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://oveay.com/about" />
     <meta property="og:image" content="https://oveay.com/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="About — Mykyta Bereg" />
+    <meta name="twitter:title" content="About – Mykyta Bereg" />
     <meta name="twitter:description" content="Mykyta Bereg is a Ukrainian-born, award-winning editor and art director." />
     <meta name="twitter:image" content="https://oveay.com/og-image.jpg" />
-    <title>About — Mykyta Bereg</title>
+    <title>About – Mykyta Bereg</title>
     <link rel="icon" type="image/png" href="./favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,11 @@
       </header>
       
       <script>
-        function navigateTo(url) { window.location.href = url; }
+        // Clicking the current page's own link would reload it and replay the fade-in
+        function navigateTo(url) {
+          if (url === './about') return;
+          window.location.href = url;
+        }
       </script>
 
       <!-- About Bio - Centered -->
