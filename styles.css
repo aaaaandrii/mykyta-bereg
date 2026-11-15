@@ -1165,6 +1165,12 @@ a {
     z-index: -1;
   }
 
+  /* Contacts scroll inside their own box, never under the header, and the
+     blur would smear the top region's heading */
+  .page-contact .header::after {
+    display: none;
+  }
+
   .header-nav {
     gap: 5px;
     margin-left: auto;
