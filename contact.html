@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=20261115" />
+    <link rel="stylesheet" href="./styles.css?v=20261115c" />
   </head>
   <body class="page-contact">
     <!-- Page Content -->
@@ -43,7 +43,7 @@
       <!-- Social Links - Bottom Center -->
       <div class="social-links social-links-center" id="socialLinks"></div>
 
-      <script src="./projects-data.js?v=20261115b"></script>
+      <script src="./projects-data.js?v=20261115c"></script>
       <script>
         (function() {
           var contacts = getContacts();
@@ -85,13 +85,11 @@
             col.classList.add('revealed');
           });
         });
-        setTimeout(function() {
-          columns.forEach(function(col, i) {
-            setTimeout(function() {
-              col.classList.add('visible');
-            }, i * 500);
-          });
-        }, 150);
+        // Staggered fade-in runs as a CSS animation from the first paint, so it
+        // isn't interrupted by the page-to-page fade
+        columns.forEach(function(col, i) {
+          col.style.animationDelay = (0.15 + i * 0.5) + 's';
+        });
       })();
     </script>
   </body>

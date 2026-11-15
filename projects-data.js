@@ -2,8 +2,11 @@ var __remoteData = null;
 (function() {
   try {
     var xhr = new XMLHttpRequest();
-    // Bypass the browser cache so published edits show up straight away
-    xhr.open('GET', './data.json?t=' + Date.now(), false);
+    // The admin always reads fresh data so it never republishes a stale copy;
+    // the site reuses a cached copy for up to a minute so pages open instantly
+    var isAdmin = /\/admin/.test(location.pathname);
+    var bust = isAdmin ? Date.now() : Math.floor(Date.now() / 60000);
+    xhr.open('GET', './data.json?t=' + bust, false);
     xhr.send();
     if (xhr.status === 200) {
       __remoteData = JSON.parse(xhr.responseText);
