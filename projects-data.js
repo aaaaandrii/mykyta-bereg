@@ -2,7 +2,8 @@ var __remoteData = null;
 (function() {
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './data.json', false);
+    // Bypass the browser cache so published edits show up straight away
+    xhr.open('GET', './data.json?t=' + Date.now(), false);
     xhr.send();
     if (xhr.status === 200) {
       __remoteData = JSON.parse(xhr.responseText);
