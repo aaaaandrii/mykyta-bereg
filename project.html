@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20261115" />
   </head>
   <body class="page-project">
     <script>
@@ -56,7 +56,7 @@
     <div class="project-center-info" id="centerInfo">
       <h2 class="center-info-title" id="centerInfoTitle"></h2>
       <p class="center-info-desc" id="centerInfoDesc"></p>
-      <button class="center-play-btn" id="centerPlayBtn" title="Play" style="display:none;">
+      <button class="center-play-btn" id="centerPlayBtn" title="Play">
         <svg width="22" height="22" viewBox="0 0 14 14" fill="white"><path d="M2 0L13 7L2 14V0Z"/></svg>
       </button>
     </div>
@@ -118,68 +118,13 @@
       </div>
     </div>
 
-    <script src="./projects-data.js"></script>
+    <script src="./projects-data.js?v=20261115"></script>
     <script>
       (function() {
         var urlParams = new URLSearchParams(window.location.search);
-        var projectId = parseInt(urlParams.get('id') || '0');
         var projects = getProjects();
-        var project = projects[projectId] || projects[0];
-
-        var prevId = (projectId - 1 + projects.length) % projects.length;
-        var nextId = (projectId + 1) % projects.length;
-
-        // Stepping to another project carries playback over, so it autoplays with sound.
-        // The picture, sound and project text fade out first; the next page fades in.
-        var leaving = false;
-        function goToProject(id) {
-          if (leaving) return;
-          leaving = true;
-          try { sessionStorage.setItem('bereg_autoplay', '1'); } catch (e) {}
-          document.body.classList.add('project-leaving');
-          var video = document.getElementById('projectVideo');
-          var startVol = video.volume;
-          var start = Date.now();
-          var fadeAudio = setInterval(function() {
-            var k = Math.min((Date.now() - start) / 500, 1);
-            video.volume = startVol * (1 - k);
-            if (k === 1) clearInterval(fadeAudio);
-          }, 25);
-          setTimeout(function() {
-            window.location.href = './project?id=' + id;
-          }, 500);
-        }
-
-        document.getElementById('navPrev').onclick = function(e) {
-          e.stopPropagation();
-          goToProject(prevId);
-        };
-        document.getElementById('navNext').onclick = function(e) {
-          e.stopPropagation();
-          goToProject(nextId);
-        };
-
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'ArrowLeft') {
-            goToProject(prevId);
-          } else if (e.key === 'ArrowRight') {
-            goToProject(nextId);
-          }
-        });
-
-        document.title = project.name + ' — Mykyta Bereg';
-        document.getElementById('projectTitle').textContent = project.name;
-        document.getElementById('projectYear').textContent = project.year;
-        document.getElementById('projectTitleMobile').textContent = project.name;
-        document.getElementById('projectYearMobile').textContent = project.year;
-        document.getElementById('projectDirector').textContent = project.director;
-        document.getElementById('projectProduction').textContent = project.production;
-
-        // Center info overlay
-        document.getElementById('centerInfoTitle').textContent = project.name;
-        document.getElementById('centerInfoDesc').textContent = project.description || '';
-
-        document.querySelector('#projectVideo source').src = project.videoFull || project.video;
+        var projectId = parseInt(urlParams.get('id') || '0');
+        if (!projects[projectId]) projectId = 0;
 
         var video = document.getElementById('projectVideo');
         var scrubber = document.getElementById('scrubberRange');
@@ -193,28 +138,46 @@
         var iconVolOff = volBtn.querySelector('.icon-vol-off');
         var fsBtn = document.getElementById('fullscreenBtn');
         var centerInfo = document.getElementById('centerInfo');
+        var centerPlayBtn = document.getElementById('centerPlayBtn');
+        var fadeEls = document.querySelectorAll('.project-page-title-wrap, .project-center-info, .project-bottom-title, .project-bottom-credits');
 
-        video.load();
-        video.volume = 1;
+        function renderProject() {
+          var project = projects[projectId];
+          document.title = project.name + ' — Mykyta Bereg';
+          document.getElementById('projectTitle').textContent = project.name;
+          document.getElementById('projectYear').textContent = project.year;
+          document.getElementById('projectTitleMobile').textContent = project.name;
+          document.getElementById('projectYearMobile').textContent = project.year;
+          document.getElementById('projectDirector').textContent = project.director;
+          document.getElementById('projectProduction').textContent = project.production;
+          document.getElementById('centerInfoTitle').textContent = project.name;
+          document.getElementById('centerInfoDesc').textContent = project.description || '';
+        }
 
         // Fade the picture in once there's a frame to show
-        function revealVideo() { video.classList.add('ready'); }
-        video.addEventListener('loadeddata', revealVideo, { once: true });
-        setTimeout(revealVideo, 2500);
+        function loadVideo() {
+          video.classList.remove('ready');
+          document.querySelector('#projectVideo source').src = projects[projectId].videoFull || projects[projectId].video;
+          video.load();
+          video.volume = 1;
+          var revealed = false;
+          function reveal() {
+            if (revealed) return;
+            revealed = true;
+            video.classList.add('ready');
+          }
+          video.addEventListener('loadeddata', reveal, { once: true });
+          setTimeout(reveal, 2500);
+        }
 
         // Opened from the works list: wait on a title card with a play button, so
-        // playback starts on a click and always has sound. Opened via next/prev:
-        // autoplay with sound, falling back to the title card where the browser
-        // blocks audible autoplay (Safari, iOS).
-        var autoplay = false;
-        try {
-          autoplay = sessionStorage.getItem('bereg_autoplay') === '1';
-          sessionStorage.removeItem('bereg_autoplay');
-          video.muted = sessionStorage.getItem('bereg_muted') === '1';
-        } catch (e) {}
-        var centerPlayBtn = document.getElementById('centerPlayBtn');
+        // playback starts on a click and always has sound.
+        try { video.muted = sessionStorage.getItem('bereg_muted') === '1'; } catch (e) {}
+        renderProject();
+        loadVideo();
 
         function showTitleCard() {
+          introPlaying = false;
           centerPlayBtn.style.display = '';
           centerInfo.classList.remove('fade-out');
         }
@@ -224,22 +187,79 @@
           video.play().catch(function() {});
         };
 
-        // The button fades out together with the title
+        // The button fades out together with the title. After next/prev the
+        // title stays up for 2 seconds while the video plays.
+        var introPlaying = false;
+        var titleTimer = null;
         video.addEventListener('play', function() {
-          centerInfo.classList.add('fade-out');
+          if (!introPlaying) centerInfo.classList.add('fade-out');
         });
 
-        if (autoplay) {
-          video.addEventListener('loadeddata', function() {
-            video.play().catch(showTitleCard);
-          }, { once: true });
-          // Fade out center info after 2 seconds
+        // Next/prev swap the video in place instead of loading a new page: the
+        // same video element keeps the permission to play with sound that the
+        // visitor's click gave it, which Safari and iOS would drop on a page load.
+        // Picture, sound and project text fade out, then the next project fades in.
+        var switching = false;
+        function goToProject(id) {
+          if (switching) return;
+          switching = true;
+          document.body.classList.add('project-leaving');
+          var startVol = video.volume;
+          var start = Date.now();
+          var fadeAudio = setInterval(function() {
+            var k = Math.min((Date.now() - start) / 500, 1);
+            video.volume = startVol * (1 - k);
+            if (k === 1) clearInterval(fadeAudio);
+          }, 25);
+
           setTimeout(function() {
-            if (!video.paused) centerInfo.classList.add('fade-out');
-          }, 2000);
-        } else {
-          showTitleCard();
+            clearInterval(fadeAudio);
+            video.pause();
+            projectId = id;
+            history.replaceState(null, '', './project?id=' + id);
+            renderProject();
+            loadVideo();
+
+            centerPlayBtn.style.display = 'none';
+            centerInfo.classList.remove('fade-out');
+            document.body.classList.remove('project-leaving');
+            fadeEls.forEach(function(el) {
+              el.style.animation = 'none';
+              el.offsetWidth;
+              el.style.animation = '';
+            });
+
+            introPlaying = true;
+            video.play().catch(showTitleCard);
+            clearTimeout(titleTimer);
+            titleTimer = setTimeout(function() {
+              introPlaying = false;
+              if (!video.paused) centerInfo.classList.add('fade-out');
+            }, 2000);
+            switching = false;
+          }, 500);
         }
+
+        function step(dir) {
+          goToProject((projectId + dir + projects.length) % projects.length);
+        }
+
+        document.getElementById('navPrev').onclick = function(e) {
+          e.stopPropagation();
+          step(-1);
+        };
+        document.getElementById('navNext').onclick = function(e) {
+          e.stopPropagation();
+          step(1);
+        };
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowLeft') {
+            step(-1);
+          } else if (e.key === 'ArrowRight') {
+            step(1);
+          }
+        });
 
         function fmt(s) {
           var m = Math.floor(s / 60);
