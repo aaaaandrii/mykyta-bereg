@@ -410,10 +410,6 @@
       const IGNORE_TAIL = SCROLL_MODE !== 'original';
       const tailRatio = 0.3;
       let wheelPeak = 0;
-      // Outside 'original', the second step of a gesture needs extra travel,
-      // so a short swipe moves exactly one title; longer scrolls then continue
-      // at the usual one title per wheelStep
-      const firstStepHold = IGNORE_TAIL ? 30 : 0;
 
       window.addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -429,7 +425,7 @@
         const dir = dy > 0 ? 1 : -1;
         if (newGesture || dir !== wheelDir) {
           wheelDir = dir;
-          wheelAccumulator = -firstStepHold;
+          wheelAccumulator = 0;
           wheelPeak = Math.abs(dy);
           setActiveItem(currentIndex + dir);
           return;
