@@ -396,7 +396,9 @@
 
       // Wheel: the first tick of a gesture moves one item right away; continued
       // scrolling (fast wheel spins, trackpad swipes) moves one item per wheelStep
-      const wheelStep = 100;
+      // perfect1 and exp1 move one title per 50px; the momentum tail they
+      // ignore would otherwise make them feel half as responsive
+      const wheelStep = SCROLL_MODE === 'original' ? 100 : 50;
       const wheelGestureGap = 200;
       let wheelAccumulator = 0;
       let wheelDir = 0;
@@ -411,7 +413,7 @@
       // Outside 'original', the second step of a gesture needs extra travel,
       // so a short swipe moves exactly one title; longer scrolls then continue
       // at the usual one title per wheelStep
-      const firstStepHold = IGNORE_TAIL ? 60 : 0;
+      const firstStepHold = IGNORE_TAIL ? 30 : 0;
 
       window.addEventListener('wheel', (e) => {
         e.preventDefault();
