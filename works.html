@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=20261115d" />
+    <link rel="stylesheet" href="./styles.css?v=20261116d" />
   </head>
   <body class="page-works">
     <!-- Background Videos -->
@@ -46,6 +46,20 @@
 
     <script src="./projects-data.js?v=20261115c"></script>
     <script>
+      // Scroll styles, picked with ?scroll=<name>:
+      //   original – hard cut
+      //   exp1     – list glides to the next item, video dips to black
+      //   p1       – list stays centred, the titles morph in size, video dips to black
+      const SCROLL_MODES = ['original', 'exp1', 'p1'];
+      const scrollParam = new URLSearchParams(location.search).get('scroll');
+      const SCROLL_MODE = SCROLL_MODES.indexOf(scrollParam) >= 0 ? scrollParam : 'p1';
+      document.body.classList.add('scroll-' + SCROLL_MODE);
+      const GLIDE_MS = 1000;
+      const MORPH_MS = 400;
+      // Both experiments fade the video out to black and the next one in
+      const DIP_TO_BLACK = SCROLL_MODE !== 'original';
+      const SETTLE_MS = SCROLL_MODE === 'exp1' ? GLIDE_MS : SCROLL_MODE === 'p1' ? MORPH_MS : 0;
+
       const projects = getProjects();
       const totalVideos = projects.length;
       const _mobile = 'ontouchstart' in window || window.innerWidth <= 768;
@@ -93,8 +107,15 @@
           }
 
           backVid.style.zIndex = '3';
+          backVid.style.transitionDelay = '0s';
           backVid.style.opacity = '0';
           frontVid.style.zIndex = '2';
+          var switchStart = Date.now();
+          if (DIP_TO_BLACK) {
+            // Dip to black: the current video fades out while the next one loads
+            frontVid.style.transitionDelay = '0s';
+            frontVid.style.opacity = '0';
+          }
 
           backVid.src = projects[idx].video;
           backVid.load();
@@ -104,6 +125,10 @@
             if (revealed || gen !== switchGen) return;
             revealed = true;
             backVid.play().catch(function() {});
+            if (DIP_TO_BLACK) {
+              var wait = Math.max(0, GLIDE_MS / 2 - (Date.now() - switchStart));
+              backVid.style.transitionDelay = wait + 'ms';
+            }
             backVid.style.opacity = '1';
             frontVid.style.opacity = '0';
             frontVid.pause();
@@ -171,9 +196,30 @@
 
       let currentIndex = startIndex;
 
+      // In p1 the list moves instantly, as in the original, but the titles
+      // morph in size. While they do, re-centre the active title every frame
+      // from its live position so it never drifts off centre
+      let followIndex = 0, followUntil = 0, followFrame = 0;
+      function centerOnLiveItem() {
+        const item = worksItems[followIndex];
+        // Item position inside the list, independent of the list's own offset
+        const r = item.getBoundingClientRect();
+        const top = r.top - worksList.getBoundingClientRect().top;
+        const y = window.innerHeight / 2 - (top + r.height / 2);
+        worksList.style.transform = `translateY(${y}px)`;
+        followFrame = Date.now() < followUntil ? requestAnimationFrame(centerOnLiveItem) : 0;
+      }
+
       function centerActiveItem(index) {
-        const activeItem = worksItems[index];
         const viewportCenter = window.innerHeight / 2;
+        if (SCROLL_MODE === 'p1') {
+          followUntil = Date.now() + MORPH_MS + 100;
+          cancelAnimationFrame(followFrame);
+          followIndex = index;
+          centerOnLiveItem();
+          return;
+        }
+        const activeItem = worksItems[index];
         let offset = 0;
         for (let i = 0; i < index; i++) {
           offset += worksItems[i].offsetHeight;
@@ -225,6 +271,17 @@
 
         currentIndex = index;
 
+        // While gliding, jump back to the middle copy only once the list stops
+        clearTimeout(recenterTimer);
+        if (SETTLE_MS) {
+          recenterTimer = setTimeout(recenterToMiddle, SETTLE_MS + 50);
+        } else {
+          recenterToMiddle();
+        }
+      }
+
+      let recenterTimer = 0;
+      function recenterToMiddle() {
         const middleStart = totalVideos * middleSet;
         const middleEnd = totalVideos * (middleSet + 1) - 1;
 
@@ -233,6 +290,7 @@
           const newIndex = middleStart + videoIdx;
 
           worksList.style.transition = 'none';
+          worksList.classList.add('no-anim');
 
           worksItems.forEach((item, i) => {
             item.classList.remove('active');
@@ -247,6 +305,7 @@
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               worksList.style.transition = '';
+              worksList.classList.remove('no-anim');
             });
           });
         }
@@ -254,7 +313,14 @@
       }
 
       function init() {
+        // Place the list without gliding in from the top
+        worksList.style.transition = 'none';
         centerActiveItem(startIndex);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            worksList.style.transition = '';
+          });
+        });
         if (_mobile) {
           showMobileVideo(randomStart);
         } else {
@@ -280,6 +346,13 @@
       });
 
       init();
+
+      // Row heights change once the web font arrives
+      if (SCROLL_MODE === 'p1' && document.fonts) {
+        document.fonts.ready.then(() => {
+          centerActiveItem(currentIndex);
+        });
+      }
 
       const videoBg = document.getElementById('worksVideoBg');
       videoBg.addEventListener('click', () => {
