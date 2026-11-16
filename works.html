@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=20261116e" />
+    <link rel="stylesheet" href="./styles.css?v=20261116i" />
   </head>
   <body class="page-works">
     <!-- Background Videos -->
@@ -49,16 +49,18 @@
       // Scroll styles, picked with ?scroll=<name>:
       //   original – hard cut
       //   exp1     – list glides to the next item, video dips to black
-      //   nice1    – original movement plus a title morph, video dips to black
-      const SCROLL_MODES = ['original', 'exp1', 'nice1'];
-      const scrollParam = new URLSearchParams(location.search).get('scroll');
-      const SCROLL_MODE = SCROLL_MODES.indexOf(scrollParam) >= 0 ? scrollParam : 'nice1';
+      //   perfect1 – original movement plus a title morph, video dips to black
+      //              (nice1 is an older name for it and still works)
+      const SCROLL_MODES = ['original', 'exp1', 'perfect1'];
+      const scrollParam = (function(p) { return p === 'nice1' ? 'perfect1' : p; })(
+        new URLSearchParams(location.search).get('scroll'));
+      const SCROLL_MODE = SCROLL_MODES.indexOf(scrollParam) >= 0 ? scrollParam : 'perfect1';
       document.body.classList.add('scroll-' + SCROLL_MODE);
       const GLIDE_MS = 1000;
       const MORPH_MS = 400;
       // Both experiments fade the video out to black and the next one in
       const DIP_TO_BLACK = SCROLL_MODE !== 'original';
-      const SETTLE_MS = SCROLL_MODE === 'exp1' ? GLIDE_MS : SCROLL_MODE === 'nice1' ? MORPH_MS : 0;
+      const SETTLE_MS = SCROLL_MODE === 'exp1' ? GLIDE_MS : SCROLL_MODE === 'perfect1' ? MORPH_MS : 0;
 
       const projects = getProjects();
       const totalVideos = projects.length;
@@ -187,7 +189,8 @@
         });
       }
 
-      const worksItems = document.querySelectorAll('.works-item');
+      // Rows in on-screen order; perfect1 reorders them to keep the list endless
+      let worksItems = Array.from(document.querySelectorAll('.works-item'));
       const worksWrappers = document.querySelectorAll('.works-video-wrap');
       const worksVideos = _mobile ? [] : document.querySelectorAll('.works-video');
 
@@ -196,7 +199,7 @@
 
       let currentIndex = startIndex;
 
-      // In nice1 the list moves instantly, as in the original, but the titles
+      // In perfect1 the list moves instantly, as in the original, but the titles
       // morph in size. While they do, re-centre the active title every frame
       // from its live position so it never drifts off centre
       let followIndex = 0, followUntil = 0, followFrame = 0;
@@ -212,7 +215,7 @@
 
       function centerActiveItem(index) {
         const viewportCenter = window.innerHeight / 2;
-        if (SCROLL_MODE === 'nice1') {
+        if (SCROLL_MODE === 'perfect1') {
           followUntil = Date.now() + MORPH_MS + 100;
           cancelAnimationFrame(followFrame);
           followIndex = index;
@@ -271,13 +274,44 @@
 
         currentIndex = index;
 
-        // While gliding, jump back to the middle copy only once the list stops
+        if (SCROLL_MODE === 'perfect1') {
+          rotateIfNearEdge();
+          return;
+        }
+
+        // While gliding, jump back to the middle copy only once the list stops,
+        // unless the list is about to run out
         clearTimeout(recenterTimer);
-        if (SETTLE_MS) {
+        const nearEdge = currentIndex < totalVideos || currentIndex >= totalItems - totalVideos;
+        if (SETTLE_MS && !nearEdge) {
           recenterTimer = setTimeout(recenterToMiddle, SETTLE_MS + 50);
         } else {
           recenterToMiddle();
         }
+      }
+
+      // perfect1: titles near the active one are mid-morph, so swapping the active
+      // row to another copy would cut the morph short. Instead, when the active
+      // row gets within one set of either end, move the set at the far end
+      // over to this end. Those far rows are idle, and the list re-centres on
+      // the live active row, so nothing on screen jumps
+      function rotateIfNearEdge() {
+        const n = totalVideos;
+        if (currentIndex < n) {
+          const tail = worksItems.slice(-n);
+          worksList.prepend(...tail);
+          worksItems = tail.concat(worksItems.slice(0, -n));
+          currentIndex += n;
+        } else if (currentIndex >= totalItems - n) {
+          const head = worksItems.slice(0, n);
+          worksList.append(...head);
+          worksItems = worksItems.slice(n).concat(head);
+          currentIndex -= n;
+        } else {
+          return;
+        }
+        followIndex = currentIndex;
+        centerOnLiveItem();
       }
 
       let recenterTimer = 0;
@@ -334,13 +368,13 @@
         centerActiveItem(currentIndex);
       });
 
-      worksItems.forEach((item, index) => {
+      worksItems.forEach((item) => {
         item.addEventListener('click', () => {
           if (item.classList.contains('active')) {
             const videoIndex = parseInt(item.dataset.video);
             window.location.href = `./project?id=${videoIndex}`;
           } else {
-            setActiveItem(index);
+            setActiveItem(worksItems.indexOf(item));
           }
         });
       });
@@ -348,7 +382,7 @@
       init();
 
       // Row heights change once the web font arrives
-      if (SCROLL_MODE === 'nice1' && document.fonts) {
+      if (SCROLL_MODE === 'perfect1' && document.fonts) {
         document.fonts.ready.then(() => {
           centerActiveItem(currentIndex);
         });
@@ -367,6 +401,17 @@
       let wheelAccumulator = 0;
       let wheelDir = 0;
       let lastWheelTime = 0;
+      // Trackpads and smooth wheels keep sending ever smaller deltas after the
+      // finger lifts. Those trailing events used to add up to one more step
+      // right as the scroll was ending. Outside 'original', events below a
+      // fraction of the gesture's peak speed are treated as that tail and ignored
+      const IGNORE_TAIL = SCROLL_MODE !== 'original';
+      const tailRatio = 0.3;
+      let wheelPeak = 0;
+      // Outside 'original', the second step of a gesture needs extra travel,
+      // so a short swipe moves exactly one title; longer scrolls then continue
+      // at the usual one title per wheelStep
+      const firstStepHold = IGNORE_TAIL ? 60 : 0;
 
       window.addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -382,10 +427,14 @@
         const dir = dy > 0 ? 1 : -1;
         if (newGesture || dir !== wheelDir) {
           wheelDir = dir;
-          wheelAccumulator = 0;
+          wheelAccumulator = -firstStepHold;
+          wheelPeak = Math.abs(dy);
           setActiveItem(currentIndex + dir);
           return;
         }
+
+        wheelPeak = Math.max(wheelPeak, Math.abs(dy));
+        if (IGNORE_TAIL && Math.abs(dy) < wheelPeak * tailRatio) return;
 
         wheelAccumulator += Math.abs(dy);
         if (wheelAccumulator >= wheelStep) {
