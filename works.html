@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=20261116d" />
+    <link rel="stylesheet" href="./styles.css?v=20261116e" />
   </head>
   <body class="page-works">
     <!-- Background Videos -->
@@ -49,16 +49,16 @@
       // Scroll styles, picked with ?scroll=<name>:
       //   original – hard cut
       //   exp1     – list glides to the next item, video dips to black
-      //   p1       – list stays centred, the titles morph in size, video dips to black
-      const SCROLL_MODES = ['original', 'exp1', 'p1'];
+      //   nice1    – original movement plus a title morph, video dips to black
+      const SCROLL_MODES = ['original', 'exp1', 'nice1'];
       const scrollParam = new URLSearchParams(location.search).get('scroll');
-      const SCROLL_MODE = SCROLL_MODES.indexOf(scrollParam) >= 0 ? scrollParam : 'p1';
+      const SCROLL_MODE = SCROLL_MODES.indexOf(scrollParam) >= 0 ? scrollParam : 'nice1';
       document.body.classList.add('scroll-' + SCROLL_MODE);
       const GLIDE_MS = 1000;
       const MORPH_MS = 400;
       // Both experiments fade the video out to black and the next one in
       const DIP_TO_BLACK = SCROLL_MODE !== 'original';
-      const SETTLE_MS = SCROLL_MODE === 'exp1' ? GLIDE_MS : SCROLL_MODE === 'p1' ? MORPH_MS : 0;
+      const SETTLE_MS = SCROLL_MODE === 'exp1' ? GLIDE_MS : SCROLL_MODE === 'nice1' ? MORPH_MS : 0;
 
       const projects = getProjects();
       const totalVideos = projects.length;
@@ -196,7 +196,7 @@
 
       let currentIndex = startIndex;
 
-      // In p1 the list moves instantly, as in the original, but the titles
+      // In nice1 the list moves instantly, as in the original, but the titles
       // morph in size. While they do, re-centre the active title every frame
       // from its live position so it never drifts off centre
       let followIndex = 0, followUntil = 0, followFrame = 0;
@@ -212,7 +212,7 @@
 
       function centerActiveItem(index) {
         const viewportCenter = window.innerHeight / 2;
-        if (SCROLL_MODE === 'p1') {
+        if (SCROLL_MODE === 'nice1') {
           followUntil = Date.now() + MORPH_MS + 100;
           cancelAnimationFrame(followFrame);
           followIndex = index;
@@ -348,7 +348,7 @@
       init();
 
       // Row heights change once the web font arrives
-      if (SCROLL_MODE === 'p1' && document.fonts) {
+      if (SCROLL_MODE === 'nice1' && document.fonts) {
         document.fonts.ready.then(() => {
           centerActiveItem(currentIndex);
         });

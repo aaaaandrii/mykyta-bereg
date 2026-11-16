@@ -493,17 +493,17 @@ a {
 /* Works scroll experiments (see SCROLL_MODES in works.html).
    Both dip the video to black: out, then in, about a second in all */
 .scroll-exp1 .works-video-wrap,
-.scroll-p1 .works-video-wrap {
+.scroll-nice1 .works-video-wrap {
   transition: opacity 0.5s ease-in-out;
 }
 
 .scroll-exp1 .works-video-wrap.active,
-.scroll-p1 .works-video-wrap.active {
+.scroll-nice1 .works-video-wrap.active {
   transition-delay: 0.5s;
 }
 
 .scroll-exp1 .works-mobile-video,
-.scroll-p1 .works-mobile-video {
+.scroll-nice1 .works-mobile-video {
   transition: opacity 0.5s ease-in-out;
 }
 
@@ -512,11 +512,11 @@ a {
   transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* Proposed 1: the list moves like the original, while the current title
+/* Nice 1: the list moves like the original, while the current title
    shrinks and the next grows; works.html keeps the active one centred */
 /* The outgoing title shrinks and dims gently */
-.scroll-p1 .works-item,
-.scroll-p1 .work-date {
+.scroll-nice1 .works-item,
+.scroll-nice1 .work-date {
   transition: font-size 0.4s cubic-bezier(0.33, 1, 0.68, 1),
     line-height 0.4s cubic-bezier(0.33, 1, 0.68, 1),
     color 0.4s ease-out;
@@ -524,16 +524,16 @@ a {
 
 /* The incoming title turns white at once and grows fast, so it reads as
    highlighted right away even while scrolling quickly */
-.scroll-p1 .works-item.active,
-.scroll-p1 .works-item.active .work-date {
+.scroll-nice1 .works-item.active,
+.scroll-nice1 .works-item.active .work-date {
   transition: font-size 0.2s cubic-bezier(0.16, 1, 0.3, 1),
     line-height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
     color 0s;
 }
 
-.scroll-p1 .works-list.no-anim,
-.scroll-p1 .works-list.no-anim .works-item,
-.scroll-p1 .works-list.no-anim .work-date {
+.scroll-nice1 .works-list.no-anim,
+.scroll-nice1 .works-list.no-anim .works-item,
+.scroll-nice1 .works-list.no-anim .work-date {
   transition: none;
 }
 
