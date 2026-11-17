@@ -279,10 +279,20 @@
       ]
     },
     {
-      "region": "UK / PERSONAL",
+      "region": "UK",
       "people": [
         {
-          "label": "PERSONAL",
+          "label": "",
+          "email": "oveay.coop@gmail.com",
+          "phone": "+48571931569"
+        }
+      ]
+    },
+    {
+      "region": "PERSONAL",
+      "people": [
+        {
+          "label": "",
           "email": "oveay.coop@gmail.com",
           "phone": "+48571931569"
         }
