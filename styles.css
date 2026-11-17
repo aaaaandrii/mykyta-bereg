@@ -822,7 +822,12 @@ a {
   transition: opacity 0.5s ease;
 }
 
-/* Project Title - Top Left */
+/* Project Title - Top Left. Hidden in the player at every size: the
+   centre title card already shows it when the video starts */
+.page-project .project-page-title-wrap {
+  display: none !important;
+}
+
 .project-page-title-wrap {
   position: fixed;
   top: 5pt;
@@ -982,7 +987,7 @@ a {
   right: 5pt;
 }
 
-/* Mobile-only title in bottom bar (hidden on desktop) */
+/* Title in the bottom bar: hidden everywhere, the centre title card shows it */
 .project-bottom-title {
   display: none;
   align-items: baseline;
@@ -1157,22 +1162,23 @@ a {
   gap: 2px;
 }
 
+/* Label (Director, Production) in serif, the name in bold sans */
 .credit-label {
-  font-family: 'Suisse Intl', sans-serif;
-  font-size: clamp(9px, 2.2vw, 26px);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: -0.05em;
-  line-height: 0.9;
-  color: #fff;
-}
-
-.credit-value {
   font-family: 'Times New Roman', Times, serif;
   font-size: clamp(9px, 2.2vw, 26px);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing);
+  line-height: 0.9;
+  color: #fff;
+}
+
+.credit-value {
+  font-family: 'Suisse Intl', sans-serif;
+  font-size: clamp(9px, 2.2vw, 26px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
   line-height: 0.9;
   color: var(--fg);
 }
@@ -1349,10 +1355,6 @@ a {
   /* Project page */
   .page-project .project-page-title-wrap {
     display: none;
-  }
-
-  .project-bottom-title {
-    display: flex;
   }
 
   .project-player-controls {
