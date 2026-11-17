@@ -154,6 +154,15 @@
       "description": "Yeat – Breathe"
     },
     {
+      "name": "Nike",
+      "year": "2025",
+      "video": "./videos/08_NIKE.mp4",
+      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/09_NIKE.mp4",
+      "director": "Shapxo",
+      "production": "Shooteurope",
+      "description": "Nike Football – Rodri"
+    },
+    {
       "name": "Chris Brown",
       "year": "2023",
       "video": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/20_CHRIS%20BROWN.mp4",
@@ -233,15 +242,6 @@
       "director": "Jamie Wandroph",
       "production": "NMBRS",
       "description": ""
-    },
-    {
-      "name": "Nike",
-      "year": "2025",
-      "video": "./videos/08_NIKE.mp4",
-      "videoFull": "https://pub-dbaef51aceed4b7aaef0999de39d1978.r2.dev/09_NIKE.mp4",
-      "director": "Shapxo",
-      "production": "Shooteurope",
-      "description": "Nike Football – Rodri"
     }
   ],
   "about": {
